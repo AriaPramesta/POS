@@ -14,15 +14,19 @@ module.exports = function (db) {
             const result = await db.query('SELECT * FROM users WHERE email = $1', [email])
 
             if (result.rows.length === 0) {
-                return res.render('login', { title: 'Login', error: "user not found" })
+                return res.send('User not found')
             }
 
             const user = result.rows[0]
             console.log(result)
             const checkPw = await comparePassword(password, user.password)
 
-            if (checkPw) return res.redirect('/dashboard')
-            else return res.render('login', { title: 'Login', error: 'Incorrect password' });
+            if (checkPw) {
+                req.session.user = user.userId
+                return res.redirect('/dashboard')
+            } else {
+                return res.send('Email or password is wrong!');
+            }
 
         } catch (error) {
             console.log(error)

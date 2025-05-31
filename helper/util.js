@@ -7,5 +7,12 @@ module.exports = {
     },
     comparePassword: function (password, hashPassword) {
         return bcrypt.compareSync(password, hashPassword)
+    },
+    isLoggedIn: function (req, res, next) {
+        if (req.session.user) {
+            return next();
+        } else {
+            res.redirect('/');
+        }
     }
 }

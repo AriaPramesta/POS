@@ -1,8 +1,9 @@
 var express = require('express');
+const { isLoggedIn } = require('../helper/util');
 var router = express.Router();
 
 module.exports = function (db) {
-  router.get('/', function (req, res, next) {
+  router.get('/', isLoggedIn, function (req, res, next) {
     res.render('dashboard', { title: 'Dashboard' });
   });
 
