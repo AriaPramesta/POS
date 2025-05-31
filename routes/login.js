@@ -4,7 +4,7 @@ var router = express.Router();
 
 module.exports = function (db) {
     router.get('/', function (req, res, next) {
-        res.render('login', { title: 'Login' });
+        res.render('login');
     });
 
     router.post('/', async (req, res) => {
@@ -19,10 +19,10 @@ module.exports = function (db) {
 
             const user = result.rows[0]
             console.log(result)
-            const checkPw = await comparePassword(password, user.password)
+            const checkPw = comparePassword(password, user.password)
 
             if (checkPw) {
-                req.session.user = user.userId
+                req.session.user = user
                 return res.redirect('/dashboard')
             } else {
                 return res.send('Email or password is wrong!');
@@ -32,6 +32,16 @@ module.exports = function (db) {
             console.log(error)
         }
     })
+
+    router.get('/logout', (req, res) => {
+        req.session.destroy((err) => {
+            if (err) {
+                console.log(err);
+                return res.status(500).send('Logout failed');
+            }
+            res.redirect('/');
+        });
+    });
 
     return router;
 }

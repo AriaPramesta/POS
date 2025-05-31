@@ -1,9 +1,10 @@
 var express = require('express');
+const { isLoggedIn } = require('../helper/util');
 var router = express.Router();
 
 module.exports = function (db) {
-  router.get('/', function (req, res, next) {
-    res.send('respond with a resource');
+  router.get('/', isLoggedIn, function (req, res, next) {
+    res.render('users', { user: req.session.user });
   });
 
   return router;
