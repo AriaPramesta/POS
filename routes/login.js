@@ -4,7 +4,10 @@ var router = express.Router();
 
 module.exports = function (db) {
     router.get('/', function (req, res, next) {
-        res.render('login');
+        res.render('login', {
+            errorMessage: req.flash('errorMessage'),
+            successMessage: req.flash('successMessage')
+        });
     });
 
     router.post('/', async (req, res) => {
@@ -14,7 +17,8 @@ module.exports = function (db) {
             const result = await db.query('SELECT * FROM users WHERE email = $1', [email])
 
             if (result.rows.length === 0) {
-                return res.send('User not found')
+                req.flash('errorMessage', "Email doesn't exist")
+                return res.redirect('/');
             }
 
             const user = result.rows[0]
@@ -25,7 +29,8 @@ module.exports = function (db) {
                 req.session.user = user
                 return res.redirect('/dashboard')
             } else {
-                return res.send('Email or password is wrong!');
+                req.flash('errorMessage', 'Wrong Email or Password!')
+                return res.redirect('/');
             }
 
         } catch (error) {
@@ -37,7 +42,6 @@ module.exports = function (db) {
         req.session.destroy((err) => {
             if (err) {
                 console.log(err);
-                return res.status(500).send('Logout failed');
             }
             res.redirect('/');
         });
