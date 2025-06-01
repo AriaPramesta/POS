@@ -22,7 +22,6 @@ module.exports = function (db) {
             }
 
             const user = result.rows[0]
-            console.log(result)
             const checkPw = comparePassword(password, user.password)
 
             if (checkPw) {
