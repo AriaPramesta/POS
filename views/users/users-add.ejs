@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>user add</title>
+</head>
+
+<body>
+    <form method="post" action="/users/add">
+        <input type="email" name="email" id="email" placeholder="email">
+        <input type="text" name="name" id="name" placeholder="name">
+        <input type="password" name="password" id="password" placeholder="password">
+        <input type="radio" name="role" id="operator" value="operator">
+        <label for="operator">Operator</label>
+        <input type="radio" name="role" id="admin" value="admin">
+        <label for="admin">Admin</label>
+
+        <button type="submit">Save</button>
+    </form>
+</body>
+
+</html>
