@@ -5,30 +5,25 @@ var router = express.Router();
 module.exports = function (db) {
   router.get('/', isLoggedIn, async function (req, res, next) {
     try {
-      const result = await db.query('SELECT * FROM users')
+      const { page = 1, query, sortMode = 'desc', sortBy = '"userId"' } = req.query
+      const limit = 3
+      const offset = limit * (page - 1)
+
+      let sql = 'SELECT * FROM users'
+      sql += ` ORDER BY ${sortBy} ${sortMode}`
+
+      const result = await db.query(sql)
 
       console.log(result.rows)
 
-      res.render('users/users', { user: req.session.user, data: result.rows });
-    } catch (error) {
-      console.log(error)
-    }
-  });
-
-  router.get('/', isLoggedIn, async function (req, res, next) {
-    try {
-      const result = await db.query('SELECT * FROM users')
-
-      console.log(result.rows)
-
-      res.render('users/users', { user: req.session.user, data: result.rows });
+      res.render('users/list', { user: req.session.user, data: result.rows });
     } catch (error) {
       console.log(error)
     }
   });
 
   router.get('/add', isLoggedIn, function (req, res, next) {
-    res.render('users/users-add', { user: req.session.user });
+    res.render('users/form', { user: req.session.user });
   });
 
   router.post('/add', isLoggedIn, async function (req, res, next) {
@@ -53,7 +48,7 @@ module.exports = function (db) {
       }
 
       const item = result.rows[0];
-      res.render('users/users-edit', { item });
+      res.render('users/form', { item });
     } catch (error) {
       console.error(error);
       res.send('Error while trying to get data');

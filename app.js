@@ -16,7 +16,7 @@ const pool = new Pool({
 });
 
 
-var loginRouter = require('./routes/login')(pool);
+var indexRouter = require('./routes/index')(pool);
 var usersRouter = require('./routes/users')(pool);
 var dashboardRouter = require('./routes/dashboard')(pool);
 
@@ -38,7 +38,7 @@ app.use(session({
 }))
 app.use(flash());
 
-app.use('/', loginRouter);
+app.use('/', indexRouter);
 app.use('/dashboard', dashboardRouter);
 app.use('/users', usersRouter);
 
