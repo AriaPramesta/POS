@@ -1,6 +1,7 @@
 var express = require('express');
 const { comparePassword } = require('../helper/util');
 var router = express.Router();
+const { User } = require('../models')
 
 module.exports = function (db) {
     router.get('/', function (req, res, next) {
@@ -14,14 +15,13 @@ module.exports = function (db) {
         const { email, password } = req.body
 
         try {
-            const result = await db.query('SELECT * FROM users WHERE email = $1', [email])
+            const user = await User.findOne({ where: { email } });
 
-            if (result.rows.length === 0) {
+            if (!user) {
                 req.flash('errorMessage', "Email doesn't exist")
                 return res.redirect('/');
             }
 
-            const user = result.rows[0]
             const checkPw = comparePassword(password, user.password)
 
             if (checkPw) {

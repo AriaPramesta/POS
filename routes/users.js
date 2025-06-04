@@ -1,22 +1,16 @@
 var express = require('express');
 const { isLoggedIn, generatePassword } = require('../helper/util');
 var router = express.Router();
+const { User } = require('../models')
 
 module.exports = function (db) {
   router.get('/', isLoggedIn, async function (req, res, next) {
     try {
-      const { page = 1, query, sortMode = 'desc', sortBy = '"userId"' } = req.query
-      const limit = 3
-      const offset = limit * (page - 1)
+      const users = await User.findAll()
 
-      let sql = 'SELECT * FROM users'
-      sql += ` ORDER BY ${sortBy} ${sortMode}`
+      console.log(users)
 
-      const result = await db.query(sql)
-
-      console.log(result.rows)
-
-      res.render('users/list', { user: req.session.user, data: result.rows });
+      res.render('users/list', { user: req.session.user, data: users });
     } catch (error) {
       console.log(error)
     }
@@ -29,7 +23,7 @@ module.exports = function (db) {
   router.post('/add', isLoggedIn, async function (req, res, next) {
     try {
       const { email, name, password, role } = req.body
-      await db.query("INSERT INTO USERS (email, name, password, role) VALUES ($1, $2, $3, $4)", [email, name, generatePassword(password), role])
+      await db.query("INSERT INTO Users (email, name, password, role) VALUES ($1, $2, $3, $4)", [email, name, generatePassword(password), role])
       res.redirect('/users')
     } catch (error) {
       console.log(error)
@@ -41,7 +35,7 @@ module.exports = function (db) {
     try {
       const userId = req.params.id;
 
-      const result = await db.query('SELECT * FROM users WHERE "userId" = $1', [userId]);
+      const result = await db.query('SELECT * FROM Users WHERE userid = $1', [userId]);
 
       if (result.rows.length === 0) {
         return res.status(404).send('Data not found');
@@ -61,7 +55,7 @@ module.exports = function (db) {
       const { email, name, role } = req.body;
 
       await db.query(
-        'UPDATE users SET email = $1, name = $2, role = $3 WHERE "userId" = $4',
+        'UPDATE Users SET email = $1, name = $2, role = $3 WHERE userid = $4',
         [email, name, role, userId]
       );
 
@@ -78,7 +72,7 @@ module.exports = function (db) {
     try {
       if (!userId) return res.status(400).send('Invalid user ID');
 
-      await db.query('DELETE FROM users WHERE "userId" = $1', [userId]);
+      await db.query('DELETE FROM Users WHERE userid = $1', [userId]);
 
       res.redirect('/users');
     } catch (err) {
