@@ -67,18 +67,9 @@ module.exports = function (db) {
   });
 
   router.post('/delete/:id', async (req, res) => {
-    const userId = req.params.id;
-
-    try {
-      if (!userId) return res.status(400).send('Invalid user ID');
-
-      await db.query('DELETE FROM Users WHERE userid = $1', [userId]);
-
-      res.redirect('/users');
-    } catch (err) {
-      console.error('Delete user error:', err);
-      res.status(500).send('Internal Server Error');
-    }
+    const { id } = req.params;
+    await User.destroy({ where: { id } });
+    res.redirect('/users');
   });
 
 
