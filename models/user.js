@@ -2,6 +2,7 @@
 const {
   Model
 } = require('sequelize');
+const { generatePassword } = require('../helper/util');
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     /**
@@ -21,6 +22,11 @@ module.exports = (sequelize, DataTypes) => {
   }, {
     sequelize,
     modelName: 'User',
+    hooks: {
+      beforeCreate: (user, options) => {
+        user.password = generatePassword(user.password)
+      },
+    }
   });
   return User;
 };

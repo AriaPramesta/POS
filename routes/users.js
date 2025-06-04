@@ -23,7 +23,7 @@ module.exports = function (db) {
   router.post('/add', isLoggedIn, async function (req, res, next) {
     try {
       const { email, name, password, role } = req.body
-      await db.query("INSERT INTO Users (email, name, password, role) VALUES ($1, $2, $3, $4)", [email, name, generatePassword(password), role])
+      await User.create({ email, name, password, role })
       res.redirect('/users')
     } catch (error) {
       console.log(error)
