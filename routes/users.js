@@ -10,14 +10,14 @@ module.exports = function (db) {
 
       console.log(users)
 
-      res.render('users/list', { user: req.session.user, data: users });
+      res.render('users/list', { user: req.session.user, data: users, });
     } catch (error) {
       console.log(error)
     }
   });
 
   router.get('/add', isLoggedIn, function (req, res, next) {
-    res.render('users/form', { user: req.session.user });
+    res.render('users/form', { user: req.session.user, item: null });
   });
 
   router.post('/add', isLoggedIn, async function (req, res, next) {
@@ -33,16 +33,15 @@ module.exports = function (db) {
 
   router.get('/edit/:id', isLoggedIn, async function (req, res, next) {
     try {
-      const userId = req.params.id;
+      const id = req.params.id;
 
-      const result = await db.query('SELECT * FROM Users WHERE userid = $1', [userId]);
+      const user = await User.findOne({ where: { id } });
 
-      if (result.rows.length === 0) {
+      if (!user) {
         return res.status(404).send('Data not found');
       }
 
-      const item = result.rows[0];
-      res.render('users/form', { item });
+      res.render('users/form', { user: req.session.user, item: user });
     } catch (error) {
       console.error(error);
       res.send('Error while trying to get data');
@@ -51,12 +50,12 @@ module.exports = function (db) {
 
   router.post('/edit/:id', isLoggedIn, async function (req, res, next) {
     try {
-      const userId = req.params.id;
+      const id = req.params.id;
       const { email, name, role } = req.body;
 
-      await db.query(
-        'UPDATE Users SET email = $1, name = $2, role = $3 WHERE userid = $4',
-        [email, name, role, userId]
+      await User.update(
+        { email, name, role },
+        { where: { id } }
       );
 
       res.redirect('/users');

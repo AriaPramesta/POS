@@ -40,50 +40,59 @@
 
                             <div class="card">
                                 <div class="card-header d-flex">
-                                    <strong class="text-primary">Form Add</strong>
+                                    <strong class="text-primary">
+                                        <%= item ? 'Form Edit' : 'Form Add' %>
+                                    </strong>
                                 </div>
-                                <form method="post" action="/users/add">
+                                <form method="post" action="<%= item ? " /users/edit/" + item.id : "/users/add" %>">
                                     <div class="card-body">
 
                                         <div class="row mb-3">
                                             <label for="email" class="col-sm-2 col-form-label">Email</label>
                                             <div class="col-sm-10">
-                                                <input type="email" class="form-control" id="email" name="email">
+                                                <input type="email" class="form-control" id="email" name="email"
+                                                    value="<%= item ? item.email : '' %>">
                                             </div>
                                         </div>
                                         <div class="row mb-3">
                                             <label for="name" class="col-sm-2 col-form-label">Name</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="name" name="name">
-                                            </div>
-                                        </div>
-                                        <div class="row mb-3">
-                                            <label for="password" class="col-sm-2 col-form-label">Password</label>
-                                            <div class="col-sm-10">
-                                                <input type="password" class="form-control" id="password"
-                                                    name="password">
+                                                <input type="text" class="form-control" id="name" name="name"
+                                                    value="<%= item ? item.name : '' %>">
                                             </div>
                                         </div>
 
-                                        <div class="row mb-3">
-                                            <span class="col-sm-2 col-form-label">Role</span>
-                                            <div class="col-sm-10">
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="role"
-                                                        id="operator" value="operator" checked>
-                                                    <label class="form-check-label" for="operator">
-                                                        Operator
-                                                    </label>
-                                                </div>
-                                                <div class="form-check">
-                                                    <input class="form-check-input" type="radio" name="role" id="admin"
-                                                        value="admin">
-                                                    <label class="form-check-label" for="admin">
-                                                        Admin
-                                                    </label>
+                                        <% if (!item) { %>
+                                            <div class="row mb-3">
+                                                <label for="password" class="col-sm-2 col-form-label">Password</label>
+                                                <div class="col-sm-10">
+                                                    <input type="password" class="form-control" id="password"
+                                                        name="password">
                                                 </div>
                                             </div>
-                                        </div>
+                                            <% } %>
+
+                                                <div class="row mb-3">
+                                                    <span class="col-sm-2 col-form-label">Role</span>
+                                                    <div class="col-sm-10">
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="role"
+                                                                id="operator" value="operator" <%=item &&
+                                                                item.role=='operator' ? 'checked' : '' %>>
+                                                            <label class="form-check-label" for="operator">
+                                                                Operator
+                                                            </label>
+                                                        </div>
+                                                        <div class="form-check">
+                                                            <input class="form-check-input" type="radio" name="role"
+                                                                id="admin" value="admin" <%=item && item.role=='admin'
+                                                                ? 'checked' : '' %>>
+                                                            <label class="form-check-label" for="admin">
+                                                                Admin
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
 
                                     </div>
                                     <div class="card-footer">
