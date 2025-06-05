@@ -100,6 +100,31 @@
                                             </thead>
                                             <tbody>
 
+                                                <% data.forEach(item=> { %>
+                                                    <tr>
+                                                        <td>
+                                                            <%= item.unit %>
+                                                        </td>
+                                                        <td>
+                                                            <%= item.name %>
+                                                        </td>
+                                                        <td>
+                                                            <%= item.note %>
+                                                        </td>
+                                                        <td>
+                                                            <a href="/units/edit/<%= item.unit %>"
+                                                                class="btn btn-circle btn-success">
+                                                                <i class="fa fa-info-circle"></i>
+                                                            </a>
+                                                            <button class="btn btn-circle btn-danger"
+                                                                data-toggle="modal" data-target="#deleteModal"
+                                                                data-id="<%= item.unit %>">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <% }); %>
+
                                             </tbody>
                                             <tfoot>
                                                 <tr>
@@ -168,7 +193,7 @@
                         $('#deleteModal').on('show.bs.modal', function (event) {
                             const button = $(event.relatedTarget);
                             const id = button.data('id');
-                            $('#deleteForm').attr('action', '/users/delete/' + id);
+                            $('#deleteForm').attr('action', '/unit/delete/' + id);
                         });
                     </script>
 

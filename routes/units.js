@@ -7,7 +7,10 @@ const { Op } = require('sequelize')
 module.exports = function (db) {
     router.get('/', isLoggedIn, async function (req, res, next) {
         try {
-            res.render('units/list', { user: req.session.user, });
+            const units = await Unit.findAll()
+            console.log(units)
+
+            res.render('units/list', { user: req.session.user, data: units });
         } catch (error) {
             console.log(error)
         }
