@@ -2,15 +2,75 @@ var express = require('express');
 const { isLoggedIn, generatePassword } = require('../helper/util');
 var router = express.Router();
 const { User } = require('../models')
+const { Op } = require('sequelize')
 
 module.exports = function (db) {
   router.get('/', isLoggedIn, async function (req, res, next) {
+    const { limit, sortBy, sortMode, search } = req.query;
+
+    if (!limit || !sortBy || !sortMode || search === undefined) {
+      const query = {
+        limit: limit || 3,
+        sortBy: sortBy || 'id',
+        sortMode: sortMode || 'DESC',
+        search: search !== undefined ? search : ''
+      };
+
+      const queryString = new URLSearchParams(query).toString();
+      return res.redirect(`/users?${queryString}`);
+    }
+
     try {
-      const users = await User.findAll()
+      const { page = 1 } = req.query
+      const keyword = req.query.search
+      const limit = +req.query.limit || 3
+      const offset = limit * (page - 1)
 
-      console.log(users)
+      const sortBy = req.query.sortBy || 'id';
+      const sortMode = req.query.sortMode?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
 
-      res.render('users/list', { user: req.session.user, data: users, });
+
+      whereClause = {}
+
+      if (keyword) {
+        {
+          whereClause = {
+            [Op.or]: [
+              { email: { [Op.iLike]: `%${keyword}%` } },
+              { name: { [Op.iLike]: `%${keyword}%` } }
+            ]
+          }
+        }
+      }
+
+      const { count: totalUsers, rows: users } = await User.findAndCountAll({
+        where: whereClause,
+        order: [[sortBy, sortMode]],
+        limit,
+        offset
+      });
+
+      const pages = Math.ceil(totalUsers / limit)
+
+      const query = { ...req.query };
+      delete query.page;
+      const queryString = new URLSearchParams(query).toString();
+      const baseUrl = `/users?${queryString}`;
+      console.log('base url: ', baseUrl)
+
+      res.render('users/list', {
+        user: req.session.user,
+        data: users,
+        search: keyword,
+        currentPage: +page,
+        pages,
+        sortBy,
+        sortMode,
+        limit,
+        offset,
+        baseUrl,
+        totalUsers
+      });
     } catch (error) {
       console.log(error)
     }
