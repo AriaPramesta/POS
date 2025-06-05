@@ -33,6 +33,12 @@ module.exports = function (db) {
         }
     });
 
+    router.post('/delete/:id', async (req, res) => {
+        const { id } = req.params;
+        await Unit.destroy({ where: { unit: id } });
+        res.redirect('/units');
+    });
+
 
     return router;
 }
