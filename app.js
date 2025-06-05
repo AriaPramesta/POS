@@ -37,6 +37,10 @@ app.use(session({
   saveUninitialized: false
 }))
 app.use(flash());
+app.use((req, res, next) => {
+  res.locals.currentPath = req.path;
+  next();
+});
 
 app.use('/', indexRouter);
 app.use('/dashboard', dashboardRouter);
