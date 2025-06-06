@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Units</title>
+
+    <%- include('../partials/core-style.ejs') %>
+
+        <style>
+            th a {
+                color: gray;
+            }
+        </style>
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <%- include('../partials/sidebar.ejs') %>
+
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <%- include('../partials/topbar.ejs') %>
+
+                        <!-- Begin Page Content -->
+                        <div class="container-fluid">
+
+                            <!-- Page Heading -->
+                            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                                <h1 class="h3 mb-0 text-gray-800">Goods</h1>
+                            </div>
+
+                            <div class="card">
+                                <div class="card-header d-flex">
+                                    <a href="/goods/add" role="button" class="btn btn-icon-split btn-primary">
+                                        <span class="icon text-white-50">
+                                            <i class="fa fa-plus"></i>
+                                        </span>
+                                        <span class="text">Add</span>
+                                    </a>
+                                </div>
+                                <div class="card-body">
+
+
+
+                                </div>
+                            </div>
+
+
+                        </div>
+
+                </div>
+                <!-- End of Content Wrapper -->
+
+            </div>
+            <!-- End of Page Wrapper -->
+
+            <!-- Scroll to Top Button-->
+            <a class="scroll-to-top rounded" href="#page-top">
+                <i class="fas fa-angle-up"></i>
+            </a>
+
+            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
+                aria-hidden="true">
+                <div class="modal-dialog">
+                    <form id="deleteForm" method="POST" action="">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
+                            </div>
+                            <div class="modal-body">
+                                Are you sure, you want to delete it?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
+                                <button type="submit" class="btn btn-primary">Yes</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <%- include('../partials/logout-modal.ejs') %>
+
+                <%- include('../partials/core-scripts.ejs') %>
+
+                    <script>
+                        $('#deleteModal').on('show.bs.modal', function (event) {
+                            const button = $(event.relatedTarget);
+                            const id = button.data('id');
+                            $('#deleteForm').attr('action', '/units/delete/' + id);
+                        });
+                    </script>
+
+
+</body>
+
+</html>
