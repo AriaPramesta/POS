@@ -10,7 +10,11 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // define association here
+      Unit.hasMany(models.Good, {
+        foreignKey: 'unit',
+        onDelete: 'RESTRICT',
+        onUpdate: 'CASCADE'
+      });
     }
   }
   Unit.init({
