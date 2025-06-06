@@ -33,6 +33,46 @@ module.exports = function (db) {
         }
     });
 
+    router.get('/edit/:id', isLoggedIn, async function (req, res, next) {
+        try {
+            const id = req.params.id;
+
+            const unit = await Unit.findOne({ where: { unit: id } });
+
+            if (!unit) {
+                return res.status(404).send('Data not found');
+            }
+
+            res.render('units/form', { user: req.session.user, item: unit });
+        } catch (error) {
+            console.error(error);
+            res.send('Error while trying to get data');
+        }
+    });
+
+    router.post('/edit/:id', isLoggedIn, async function (req, res, next) {
+        try {
+            const id = req.params.id;
+            const { unit, name, note } = req.body;
+
+            const unitData = await Unit.findByPk(id);
+            if (!unitData) {
+                return res.send('Data not found');
+            }
+            unitData.unit = unit;
+            unitData.name = name;
+            unitData.note = note;
+
+            await unitData.save();
+
+            res.redirect('/units');
+        } catch (error) {
+            console.error(error);
+            res.send('Terjadi kesalahan saat memperbarui data');
+        }
+    });
+
+
     router.post('/delete/:id', async (req, res) => {
         const { id } = req.params;
         await Unit.destroy({ where: { unit: id } });
