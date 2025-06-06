@@ -6,6 +6,7 @@ var logger = require('morgan');
 const { Pool } = require('pg')
 const session = require('express-session');
 const flash = require('connect-flash');
+const fileUpload = require('express-fileupload');
 
 const pool = new Pool({
   user: 'pramesta',
@@ -43,6 +44,7 @@ app.use((req, res, next) => {
   res.locals.currentPath = req.path;
   next();
 });
+app.use(fileUpload());
 
 app.use('/', indexRouter);
 app.use('/dashboard', dashboardRouter);

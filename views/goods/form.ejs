@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Goods</title>
+
+    <%- include('../partials/core-style.ejs') %>
+
+</head>
+
+<body id="page-top">
+
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+
+        <%- include('../partials/sidebar.ejs') %>
+
+            <!-- Content Wrapper -->
+            <div id="content-wrapper" class="d-flex flex-column">
+
+                <!-- Main Content -->
+                <div id="content">
+
+                    <%- include('../partials/topbar.ejs') %>
+
+                        <!-- Begin Page Content -->
+                        <div class="container-fluid">
+
+                            <!-- Page Heading -->
+                            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+                                <h1 class="h3 mb-0 text-gray-800">Units</h1>
+                            </div>
+
+                            <div class="card mb-5">
+                                <div class="card-header d-flex">
+                                    <strong class="text-primary">
+                                        Form Add
+                                    </strong>
+                                </div>
+                                <form method="post" action="/goods/add" enctype="multipart/form-data">
+                                    <div class="card-body">
+
+                                        <div class="row mb-3">
+                                            <label for="barcode" class="col-sm-2 col-form-label">Barcode</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="barcode" name="barcode">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <label for="name" class="col-sm-2 col-form-label">Name</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="name" name="name">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <label for="stock" class="col-sm-2 col-form-label">Stock</label>
+                                            <div class="col-sm-10">
+                                                <input type="number" class="form-control" id="stock" name="stock">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <label for="purchaseprice" class="col-sm-2 col-form-label">Purchase
+                                                Price</label>
+                                            <div class="col-sm-10">
+                                                <input type="number" step="0.01" class="form-control" id="purchaseprice"
+                                                    name="purchaseprice">
+                                            </div>
+                                        </div>
+                                        <div class="row mb-3">
+                                            <label for="sellingprice" class="col-sm-2 col-form-label">Selling
+                                                Price</label>
+                                            <div class="col-sm-10">
+                                                <input type="number" step="0.01" class="form-control" id="sellingprice"
+                                                    name="sellingprice">
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-3">
+                                            <label for="unitSelect" class="col-sm-2 col-form-label">Unit</label>
+                                            <div class="col-sm-10">
+                                                <select class="form-control" id="unitSelect" name="unit">
+                                                    <% units.forEach(item=> { %>
+                                                        <option value="<%= item.unit %>">
+                                                            <%= item.name %>
+                                                        </option>
+                                                        <% }); %>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row">
+                                            <label for="picture" class="col-sm-2 col-form-label">Picture</label>
+                                            <div class="col-sm-10">
+                                                <div class="custom-file">
+                                                    <input type="file" class="custom-file-input" id="picture"
+                                                        name="picture">
+                                                    <label class="custom-file-label" for="picture">Choose
+                                                        file</label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group row mb-3 d-none" id="previewContainer">
+                                            <label class="col-sm-2 col-form-label">Preview</label>
+                                            <div class="col-sm-10">
+                                                <div class="border rounded" style="width: 700px; height: 450px;">
+                                                    <img id="previewImage" src="/images/undraw_profile.svg"
+                                                        alt="Preview"
+                                                        style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="card-footer">
+                                        <button type="submit" role="button" class="btn btn-icon-split btn-primary">
+                                            <span class="icon text-white-50">
+                                                <i class="fa fa-database"></i>
+                                            </span>
+                                            <span class="text">Save</span>
+                                        </button>
+                                        <a href="/units" role="button" class="btn btn-icon-split btn-warning">
+                                            <span class="icon text-white-50">
+                                                <i class="fa fa-arrow-left"></i>
+                                            </span>
+                                            <span class="text">Back</span>
+                                        </a>
+                                    </div>
+                                </form>
+                            </div>
+
+
+                        </div>
+
+                </div>
+                <!-- End of Content Wrapper -->
+
+            </div>
+            <!-- End of Page Wrapper -->
+
+            <!-- Scroll to Top Button-->
+            <a class="scroll-to-top rounded" href="#page-top">
+                <i class="fas fa-angle-up"></i>
+            </a>
+
+            <%- include('../partials/logout-modal.ejs') %>
+
+                <%- include('../partials/core-scripts.ejs') %>
+
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            const pictureInput = document.getElementById('picture');
+                            const previewImage = document.getElementById('previewImage');
+                            const previewContainer = document.getElementById('previewContainer');
+                            const label = pictureInput.nextElementSibling;
+
+                            pictureInput.addEventListener('change', function () {
+                                const file = pictureInput.files[0];
+
+                                if (file) {
+                                    label.textContent = file.name;
+
+                                    const reader = new FileReader();
+                                    reader.onload = function (e) {
+                                        previewImage.src = e.target.result;
+                                        previewContainer.classList.remove('d-none');
+                                    };
+                                    reader.readAsDataURL(file);
+                                } else {
+                                    label.textContent = 'Choose file';
+                                    previewImage.src = '';
+                                    previewContainer.classList.add('d-none');
+                                }
+                            });
+                        });
+                    </script>
+
+</body>
+
+</html>
