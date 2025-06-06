@@ -6,18 +6,80 @@ const { Op } = require('sequelize')
 
 module.exports = function (db) {
     router.get('/', isLoggedIn, async function (req, res, next) {
+        const { limit, sortBy, sortMode, search } = req.query;
+
+        if (!limit || !sortBy || !sortMode || search === undefined) {
+            const query = {
+                limit: limit || 3,
+                sortBy: sortBy || 'unit',
+                sortMode: sortMode || 'DESC',
+                search: search !== undefined ? search : ''
+            };
+
+            const queryString = new URLSearchParams(query).toString();
+            return res.redirect(`/units?${queryString}`);
+        }
+
         try {
-            const units = await Unit.findAll()
+            const { page = 1 } = req.query
+            const keyword = req.query.search
+            const limit = +req.query.limit || 3
+            const offset = limit * (page - 1)
+
+            const sortBy = req.query.sortBy || 'unit';
+            const sortMode = req.query.sortMode?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+
+            whereClause = {}
+
+            if (keyword) {
+                {
+                    whereClause = {
+                        [Op.or]: [
+                            { unit: { [Op.iLike]: `%${keyword}%` } },
+                            { name: { [Op.iLike]: `%${keyword}%` } },
+                            { note: { [Op.iLike]: `%${keyword}%` } }
+                        ]
+                    }
+                }
+            }
+
+            const { count: totalUnits, rows: units } = await Unit.findAndCountAll({
+                where: whereClause,
+                order: [[sortBy, sortMode]],
+                limit,
+                offset
+            });
             console.log(units)
 
-            res.render('units/list', { user: req.session.user, data: units });
+            const pages = Math.ceil(totalUnits / limit)
+
+            const query = { ...req.query };
+            delete query.page;
+            const queryString = new URLSearchParams(query).toString();
+            const baseUrl = `/units?${queryString}`;
+            console.log('base url: ', baseUrl)
+
+            res.render('units/list', {
+                user: req.session.user,
+                data: units,
+                search: keyword,
+                currentPage: +page,
+                pages,
+                sortBy,
+                sortMode,
+                limit,
+                offset,
+                baseUrl,
+                totalUnits
+            });
         } catch (error) {
             console.log(error)
         }
     });
 
     router.get('/add', isLoggedIn, async function (req, res, next) {
-        res.render('units/form', { user: req.session.user, });
+        res.render('units/form', { user: req.session.user, item: null });
     });
 
     router.post('/add', isLoggedIn, async function (req, res, next) {
