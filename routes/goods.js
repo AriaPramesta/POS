@@ -8,7 +8,12 @@ const { Op } = require('sequelize')
 
 module.exports = function (db) {
     router.get('/', isLoggedIn, async function (req, res, next) {
-        res.render('goods/list', { user: req.session.user });
+        try {
+            const goods = await Good.findAll()
+            res.render('goods/list', { user: req.session.user, data: goods });
+        } catch (error) {
+            console.log(error)
+        }
     });
 
     router.get('/add', isLoggedIn, async function (req, res, next) {
@@ -62,6 +67,12 @@ module.exports = function (db) {
             console.error(error);
             res.status(500).send("Unexpected error.");
         }
+    });
+
+    router.post('/delete/:id', async (req, res) => {
+        const { id } = req.params;
+        await Good.destroy({ where: { barcode: id } });
+        res.redirect('/goods');
     });
 
     return router;

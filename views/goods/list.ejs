@@ -71,7 +71,42 @@
                                             </thead>
                                             <tbody>
 
-
+                                                <% data.forEach(item=> { %>
+                                                    <tr>
+                                                        <td>
+                                                            <%= item.barcode %>
+                                                        </td>
+                                                        <td>
+                                                            <%= item.stock %>
+                                                        </td>
+                                                        <td>
+                                                            <%= item.name %>
+                                                        </td>
+                                                        <td>
+                                                            <%= item.unit %>
+                                                        </td>
+                                                        <td>
+                                                            <%= item.purchaseprice %>
+                                                        </td>
+                                                        <td>
+                                                            <%= item.sellingprice %>
+                                                        </td>
+                                                        <td><img src="/images/goods/<%= item.picture %>" alt="picture"
+                                                                width="100px" height="100px">
+                                                        </td>
+                                                        <td>
+                                                            <a href="/goods/edit/<%= item.barcode %>"
+                                                                class="btn btn-circle btn-success">
+                                                                <i class="fa fa-info-circle"></i>
+                                                            </a>
+                                                            <button class="btn btn-circle btn-danger"
+                                                                data-toggle="modal" data-target="#deleteModal"
+                                                                data-id="<%= item.barcode %>">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <% }) %>
 
                                             </tbody>
                                             <tfoot>
@@ -134,7 +169,7 @@
                         $('#deleteModal').on('show.bs.modal', function (event) {
                             const button = $(event.relatedTarget);
                             const id = button.data('id');
-                            $('#deleteForm').attr('action', '/units/delete/' + id);
+                            $('#deleteForm').attr('action', '/goods/delete/' + id);
                         });
                     </script>
 
