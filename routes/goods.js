@@ -8,9 +8,72 @@ const { Op } = require('sequelize')
 
 module.exports = function (db) {
     router.get('/', isLoggedIn, async function (req, res, next) {
+        const { limit, sortBy, sortMode, search } = req.query;
+
+        if (!limit || !sortBy || !sortMode || search === undefined) {
+            const query = {
+                limit: limit || 3,
+                sortBy: sortBy || 'barcode',
+                sortMode: sortMode || 'DESC',
+                search: search !== undefined ? search : ''
+            };
+
+            const queryString = new URLSearchParams(query).toString();
+            return res.redirect(`/goods?${queryString}`);
+        }
+
         try {
-            const goods = await Good.findAll()
-            res.render('goods/list', { user: req.session.user, data: goods });
+            const { page = 1 } = req.query
+            const keyword = req.query.search
+            const limit = +req.query.limit || 3
+            const offset = limit * (page - 1)
+
+            const sortBy = req.query.sortBy || 'barcode';
+            const sortMode = req.query.sortMode?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+
+            whereClause = {}
+
+            if (keyword) {
+                {
+                    whereClause = {
+                        [Op.or]: [
+                            { barcode: { [Op.iLike]: `%${keyword}%` } },
+                            { name: { [Op.iLike]: `%${keyword}%` } }
+                        ]
+                    }
+                }
+            }
+
+            const { count: totalGoods, rows: goods } = await Good.findAndCountAll({
+                where: whereClause,
+                order: [[sortBy, sortMode]],
+                limit,
+                offset
+            });
+            console.log(goods)
+
+            const pages = Math.ceil(totalGoods / limit)
+
+            const query = { ...req.query };
+            delete query.page;
+            const queryString = new URLSearchParams(query).toString();
+            const baseUrl = `/goods?${queryString}`;
+            console.log('base url: ', baseUrl)
+
+            res.render('goods/list', {
+                user: req.session.user,
+                data: goods,
+                search: keyword,
+                currentPage: +page,
+                pages,
+                sortBy,
+                sortMode,
+                limit,
+                offset,
+                baseUrl,
+                totalGoods
+            });
         } catch (error) {
             console.log(error)
         }
