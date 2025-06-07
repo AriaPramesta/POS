@@ -19,7 +19,7 @@ module.exports = function (db) {
     router.get('/add', isLoggedIn, async function (req, res, next) {
         try {
             const units = await Unit.findAll()
-            res.render('goods/form', { user: req.session.user, units });
+            res.render('goods/form', { user: req.session.user, units, good: null });
         } catch (error) {
             console.log(error)
         }
@@ -66,6 +66,51 @@ module.exports = function (db) {
         } catch (error) {
             console.error(error);
             res.status(500).send("Unexpected error.");
+        }
+    });
+
+    router.get('/edit/:id', isLoggedIn, async function (req, res, next) {
+        try {
+            const id = req.params.id;
+
+            const good = await Good.findOne({ where: { barcode: id } });
+            const units = await Unit.findAll()
+
+            if (!good) {
+                return res.status(404).send('Data not found');
+            }
+
+            res.render('goods/form', { user: req.session.user, units, good });
+        } catch (error) {
+            console.error(error);
+            res.send('Error while trying to get data');
+        }
+    });
+
+    router.post('/edit/:id', isLoggedIn, async function (req, res, next) {
+        try {
+            const id = req.params.id;
+            const { barcode, name, stock, unit, purchaseprice, sellingprice, picture } = req.body;
+
+            const goodData = await Good.findByPk(id);
+            if (!goodData) {
+                return res.send('Data not found');
+            }
+
+            goodData.barcode = barcode;
+            goodData.name = name;
+            goodData.stock = stock;
+            goodData.unit = unit;
+            goodData.purchaseprice = purchaseprice;
+            goodData.sellingprice = sellingprice;
+            goodData.picture = picture;
+
+            await goodData.save();
+
+            res.redirect('/goods');
+        } catch (error) {
+            console.error(error);
+            res.send('Terjadi kesalahan saat memperbarui data');
         }
     });
 

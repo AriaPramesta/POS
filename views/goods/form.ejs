@@ -41,28 +41,37 @@
                             <div class="card mb-5">
                                 <div class="card-header d-flex">
                                     <strong class="text-primary">
-                                        Form Add
+                                        <%= good ? 'Form Edit' : 'Form Add' %>
                                     </strong>
                                 </div>
-                                <form method="post" action="/goods/add" enctype="multipart/form-data">
+                                <form method="post" action="<%= good ? '/goods/edit/' + good.barcode : '/goods/add' %>"
+                                    enctype="multipart/form-data">
+
                                     <div class="card-body">
 
                                         <div class="row mb-3">
                                             <label for="barcode" class="col-sm-2 col-form-label">Barcode</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="barcode" name="barcode">
+                                                <input type="text" class="form-control" id="barcode" name="barcode"
+                                                    value="<%= good ? good.barcode : '' %>" <%=good ? 'readonly' : ''
+                                                    %>>
+
                                             </div>
                                         </div>
                                         <div class="row mb-3">
                                             <label for="name" class="col-sm-2 col-form-label">Name</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="name" name="name">
+                                                <input type="text" class="form-control" id="name" name="name"
+                                                    value="<%= good ? good.name : '' %>">
+
                                             </div>
                                         </div>
                                         <div class="row mb-3">
                                             <label for="stock" class="col-sm-2 col-form-label">Stock</label>
                                             <div class="col-sm-10">
-                                                <input type="number" class="form-control" id="stock" name="stock">
+                                                <input type="number" class="form-control" id="stock" name="stock"
+                                                    value="<%= good ? good.stock : '' %>">
+
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -70,7 +79,8 @@
                                                 Price</label>
                                             <div class="col-sm-10">
                                                 <input type="number" step="0.01" class="form-control" id="purchaseprice"
-                                                    name="purchaseprice">
+                                                    name="purchaseprice" value="<%= good ? good.purchaseprice : '' %>">
+
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -78,7 +88,8 @@
                                                 Price</label>
                                             <div class="col-sm-10">
                                                 <input type="number" step="0.01" class="form-control" id="sellingprice"
-                                                    name="sellingprice">
+                                                    name="sellingprice" value="<%= good ? good.sellingprice : '' %>">
+
                                             </div>
                                         </div>
                                         <div class="form-group row mb-3">
@@ -86,11 +97,13 @@
                                             <div class="col-sm-10">
                                                 <select class="form-control" id="unitSelect" name="unit">
                                                     <% units.forEach(item=> { %>
-                                                        <option value="<%= item.unit %>">
+                                                        <option value="<%= item.unit %>" <%=good &&
+                                                            good.unit===item.unit ? 'selected' : '' %>>
                                                             <%= item.name %>
                                                         </option>
-                                                        <% }); %>
+                                                        <% }) %>
                                                 </select>
+
                                             </div>
                                         </div>
                                         <div class="form-group row">
@@ -104,11 +117,13 @@
                                                 </div>
                                             </div>
                                         </div>
-                                        <div class="form-group row mb-3 d-none" id="previewContainer">
+                                        <div class="form-group row mb-3 d-<%= good && good.picture ? '' : 'none' %>"
+                                            id="previewContainer">
                                             <label class="col-sm-2 col-form-label">Preview</label>
                                             <div class="col-sm-10">
                                                 <div class="border rounded" style="width: 700px; height: 450px;">
-                                                    <img id="previewImage" src="/images/undraw_profile.svg"
+                                                    <img id="previewImage"
+                                                        src="<%= good && good.picture ? '/images/goods/' + good.picture : '/images/undraw_profile.svg' %>"
                                                         alt="Preview"
                                                         style="width: 100%; height: 100%; object-fit: cover; border-radius: 4px;">
                                                 </div>
