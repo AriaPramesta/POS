@@ -2,7 +2,6 @@ var express = require('express');
 const { isLoggedIn } = require('../helper/util');
 var router = express.Router();
 const path = require('path');
-const fs = require('fs');
 const { Good, Unit } = require('../models')
 const { Op } = require('sequelize')
 

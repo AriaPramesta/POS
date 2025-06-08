@@ -28,11 +28,11 @@
     </div>
 
     <!-- Nav Item - Utilities Collapse Menu -->
-    <li class="nav-item">
-        <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
-            aria-expanded="true" aria-controls="collapseUtilities">
-            <i class="fas fa-fw fa-wrench"></i>
-            <span>Good Utilities</span>
+    <li class="nav-item <%= currentPath.startsWith('/goods') || currentPath.startsWith('/units') ? 'active' : '' %>"">
+        <a class=" nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
+        aria-expanded="true" aria-controls="collapseUtilities">
+        <i class="fas fa-fw fa-wrench"></i>
+        <span>Good Utilities</span>
         </a>
         <div id="collapseUtilities" class="collapse" aria-labelledby="headingUtilities" data-parent="#accordionSidebar">
             <div class="bg-white py-2 collapse-inner rounded">
@@ -44,8 +44,8 @@
     </li>
 
     <!-- Nav Item - Suppliers -->
-    <li class="nav-item">
-        <a class="nav-link" href="#">
+    <li class="nav-item <%=currentPath.startsWith('/suppliers') ? 'active' : '' %>">
+        <a class="nav-link" href="/suppliers">
             <i class="fas fa-fw fa-link"></i>
             <span>Suppliers</span></a>
     </li>
