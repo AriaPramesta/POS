@@ -73,5 +73,15 @@ module.exports = function (db) {
         }
     });
 
+    router.post('/delete/:id', async function (req, res) {
+        try {
+            const supplierid = parseInt(req.params.id)
+            await Supplier.destroy({ where: { supplierid } })
+            res.redirect('/suppliers')
+        } catch (error) {
+            console.log(error)
+        }
+    })
+
     return router;
 }
