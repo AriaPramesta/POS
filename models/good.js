@@ -12,7 +12,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Good.belongsTo(models.Unit, {
         foreignKey: 'unit',
-        onDelete: 'CASCADE',
+        onDelete: 'RESTRICT',
         onUpdate: 'CASCADE'
       });
       Good.hasMany(models.PurchaseItem, {
