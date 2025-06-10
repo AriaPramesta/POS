@@ -116,6 +116,7 @@ module.exports = function (db) {
         try {
             const id = req.params.id;
             const { unit, name, note } = req.body;
+            console.log(req.body)
 
             const unitData = await Unit.findByPk(id);
             if (!unitData) {
