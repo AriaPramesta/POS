@@ -51,7 +51,7 @@
                                             <label for="unit" class="col-sm-2 col-form-label">Unit</label>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="unit" name="unit"
-                                                    value="<%= item ? item.unit : '' %>">
+                                                    value="<%= item ? item.unit : '' %>" <%=item ? 'readonly' : '' %>>
                                             </div>
                                         </div>
                                         <div class="row mb-3">

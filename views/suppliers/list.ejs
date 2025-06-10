@@ -223,37 +223,19 @@
                 <i class="fas fa-angle-up"></i>
             </a>
 
-            <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel"
-                aria-hidden="true">
-                <div class="modal-dialog">
-                    <form id="deleteForm" method="POST" action="">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="deleteModalLabel">Delete Confirmation</h5>
-                            </div>
-                            <div class="modal-body">
-                                Are you sure, you want to delete it?
-                            </div>
-                            <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-dismiss="modal">No</button>
-                                <button type="submit" class="btn btn-primary">Yes</button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-
             <%- include('../partials/logout-modal.ejs') %>
 
-                <%- include('../partials/core-scripts.ejs') %>
+                <%- include('../partials/delete-modal.ejs') %>
 
-                    <script>
-                        $('#deleteModal').on('show.bs.modal', function (event) {
-                            const button = $(event.relatedTarget);
-                            const id = button.data('id');
-                            $('#deleteForm').attr('action', '/suppliers/delete/' + id);
-                        });
-                    </script>
+                    <%- include('../partials/core-scripts.ejs') %>
+
+                        <script>
+                            $('#deleteModal').on('show.bs.modal', function (event) {
+                                const button = $(event.relatedTarget);
+                                const id = button.data('id');
+                                $('#deleteForm').attr('action', '/suppliers/delete/' + id);
+                            });
+                        </script>
 
 
 </body>
