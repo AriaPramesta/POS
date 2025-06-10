@@ -14,3 +14,11 @@
 <!-- Page level custom scripts -->
 <script src="/javascripts/demo/chart-area-demo.js"></script>
 <script src="/javascripts/demo/chart-pie-demo.js"></script>
+
+<script>
+    $('#deleteModal').on('show.bs.modal', function (event) {
+        const button = $(event.relatedTarget);
+        const id = button.data('id');
+        $('#deleteForm').attr('action', '/units/delete/' + id);
+    });
+</script>
