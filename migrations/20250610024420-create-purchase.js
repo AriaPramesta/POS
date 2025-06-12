@@ -10,7 +10,8 @@ module.exports = {
       },
       time: {
         type: Sequelize.DATE,
-        allowNull: false
+        allowNull: false,
+        defaultValue: Sequelize.literal('NOW()')
       },
       totalsum: {
         type: Sequelize.DECIMAL(19, 2),

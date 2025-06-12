@@ -32,11 +32,13 @@ module.exports = (sequelize, DataTypes) => {
     invoice: {
       allowNull: false,
       primaryKey: true,
-      type: DataTypes.STRING(20)
+      type: DataTypes.STRING(20),
+      defaultValue: sequelize.literal('purchase_invoice()')
     },
     time: {
       type: DataTypes.DATE,
-      allowNull: false
+      allowNull: false,
+      defaultValue: sequelize.literal('NOW()'),
     },
     totalsum: {
       type: DataTypes.DECIMAL(19, 2),
