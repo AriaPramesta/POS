@@ -44,7 +44,7 @@
                                         Transaction
                                     </h1>
                                 </div>
-                                <form method="post" action="/purchases/add">
+                                <form method="post" action="/purchases/edit/<%= purchase.invoice %>">
 
                                     <div class="card-body">
                                         <div class="form-row mb-5">
@@ -151,6 +151,13 @@
                                                                 <%= Number(item.totalprice).toLocaleString('id-ID', {
                                                                     style: 'currency' , currency: 'IDR' }) %>
                                                             </td>
+                                                            <td>
+                                                                <button class="btn btn-circle btn-danger" type="button"
+                                                                    data-toggle="modal" data-target="#deleteModal"
+                                                                    data-id="<%= item.id %>">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </button>
+                                                            </td>
                                                         </tr>
                                                         <% }) %>
                                                             <% } else { %>
@@ -177,15 +184,19 @@
                                             <div class="col-sm-10">
                                                 <select class="form-control" id="supplierSelect" name="supplier">
                                                     <% suppliers.forEach(supplier=> { %>
-                                                        <option value="<%= supplier.id %>">
+                                                        <option value="<%= supplier.supplierid %>"
+                                                            <%=purchase?.supplier==supplier.supplierid ? 'selected' : ''
+                                                            %>>
                                                             <%= supplier.name %>
                                                         </option>
                                                         <% }); %>
                                                 </select>
+
                                             </div>
                                         </div>
 
-                                        <button type="submit" role="button" class="btn btn-icon-split btn-success">
+                                        <button type="button" onclick="submitPurchase()"
+                                            class="btn btn-icon-split btn-success">
                                             <span class="icon text-white-50">
                                                 <i class="fa fa-plus"></i>
                                             </span>
@@ -219,6 +230,15 @@
             <%- include('../partials/logout-modal.ejs') %>
 
                 <%- include('../partials/core-scripts.ejs') %>
+
+                    <script>
+                        $('#deleteModal').on('show.bs.modal', function (event) {
+                            const button = $(event.relatedTarget);
+                            const id = button.data('id');
+                            $('#deleteForm').attr('action', `/purchases/delete/${id}/item`);
+                        });
+                    </script>
+
 
                     <script type="application/json" id="goods-data">
                         <%- JSON.stringify(goods) %>
@@ -334,6 +354,47 @@
                                 })
                                 .catch(err => {
                                     alert('Gagal tambah item: ' + err.message);
+                                });
+                        }
+
+                        // Handle edit purchase
+
+                        function submitPurchase() {
+                            const invoice = document.getElementById('invoice').value;
+                            const time = document.getElementById('time').value
+                            const supplier = document.getElementById('supplierSelect').value;
+                            const totalsum = parseFloat(document.getElementById('totalsum').value);
+
+                            console.log('Supplier:', supplier);
+                            console.log('Type:', typeof supplier);
+
+
+                            if (!supplier) {
+                                alert('Supplier harus diisi.');
+                                return;
+                            }
+
+                            const body = new URLSearchParams();
+                            body.append('time', time);
+                            body.append('supplier', supplier);
+                            body.append('totalsum', totalsum);
+
+                            fetch(`/purchases/edit/${invoice}`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/x-www-form-urlencoded'
+                                },
+                                body: body.toString()
+                            })
+                                .then(res => {
+                                    if (!res.ok) throw new Error('Gagal menyimpan transaksi.');
+                                    return res.text();
+                                })
+                                .then(() => {
+                                    window.location.href = '/purchases';
+                                })
+                                .catch(err => {
+                                    alert('Error: ' + err.message);
                                 });
                         }
 

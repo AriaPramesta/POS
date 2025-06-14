@@ -2,6 +2,7 @@ var express = require('express');
 const { isLoggedIn } = require('../helper/util');
 const { Purchase, Supplier, User, Good, PurchaseItem } = require('../models')
 const moment = require('moment');
+const { where } = require('sequelize');
 var router = express.Router();
 
 module.exports = function (db) {
@@ -81,6 +82,48 @@ module.exports = function (db) {
 
         }
     })
+
+    router.post('/edit/:invoice', isLoggedIn, async function (req, res) {
+        const { invoice } = req.params
+        const { time, supplier, totalsum } = req.body
+
+        try {
+            const item = await Purchase.update(
+                { time, supplier, totalsum },
+                { where: { invoice } }
+
+            )
+            res.status(201).json(item)
+        } catch (error) {
+            console.log(err)
+            res.status(400).json({ error: err.message });
+
+        }
+    })
+
+    router.post('/delete/:invoice', isLoggedIn, async (req, res) => {
+        const { invoice } = req.params;
+
+        try {
+            await Purchase.destroy({ where: { invoice } });
+        } catch (err) {
+            console.error(err);
+            res.status(500).send('Gagal menghapus item');
+        }
+    });
+
+    router.post('/delete/:id/item', isLoggedIn, async (req, res) => {
+        const { id } = req.params;
+
+        try {
+            await PurchaseItem.destroy({ where: { id } });
+            res.redirect('back');
+        } catch (err) {
+            console.error(err);
+            res.status(500).send('Gagal menghapus item');
+        }
+    });
+
 
     return router
 }

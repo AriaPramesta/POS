@@ -80,7 +80,8 @@
                                                             <%= moment(purchase.time).format('DD MMM YYYY HH:mm:ss') %>
                                                         </td>
                                                         <td>
-                                                            <%= purchase.totalsum %>
+                                                            <%= Number(purchase.totalsum).toLocaleString('id-ID', {
+                                                                style: 'currency' , currency: 'IDR' }) %>
                                                         </td>
                                                         <td>
                                                             <%= purchase.Supplier.name %>
@@ -139,6 +140,14 @@
             <%- include('../partials/logout-modal.ejs') %>
                 <%- include('../partials/delete-modal.ejs') %>
                     <%- include('../partials/core-scripts.ejs') %>
+
+                        <script>
+                            $('#deleteModal').on('show.bs.modal', function (event) {
+                                const button = $(event.relatedTarget);
+                                const id = button.data('id');
+                                $('#deleteForm').attr('action', '/purchases/delete/' + id);
+                            });
+                        </script>
 </body>
 
 </html>
