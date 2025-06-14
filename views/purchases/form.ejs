@@ -55,12 +55,16 @@
                                             </div>
                                             <div class="col-md-4">
                                                 <label for="time">Time</label>
-                                                <input type="text" class="form-control" id="time" name="time" readonly>
+                                                <input type="text" class="form-control" id="time" name="time"
+                                                    value="<%= currentDateTime %>" readonly>
                                             </div>
                                             <div class="col-md-4">
-                                                <label for="operator">Operator</label>
-                                                <input type="text" class="form-control" id="operator" name="operator"
-                                                    readonly>
+                                                <label>Operator</label>
+                                                <select name="operator" class="form-control" disabled>
+                                                    <option value="<%= purchase.operator %>">
+                                                        <%= purchase.User.name %>
+                                                    </option>
+                                                </select>
                                             </div>
                                         </div>
 
@@ -69,36 +73,41 @@
                                         <div class="form-row align-items-end mb-4">
                                             <div class="col-md-4">
                                                 <label>Goods Barcode</label>
-                                                <select class="form-control">
-                                                    <option>8850389108315 - Mogu Mogu Grapes</option>
+                                                <select class="form-control" id="barcodeSelect">
+                                                    <% goods.forEach(good=> { %>
+                                                        <option value="<%= good.barcode %>">
+                                                            <%= good.barcode %> - <%= good.name %>
+                                                        </option>
+                                                        <% }); %>
                                                 </select>
                                             </div>
                                             <div class="col-md-4">
                                                 <label>Goods Name</label>
-                                                <input type="text" class="form-control" readonly>
+                                                <input type="text" id="goodName" class="form-control" readonly>
                                             </div>
                                             <div class="col-md-4">
                                                 <label>Stock</label>
-                                                <input type="text" class="form-control" readonly>
+                                                <input type="text" id="stock" class="form-control" readonly>
                                             </div>
                                         </div>
 
                                         <div class="form-row align-items-end mb-3">
                                             <div class="col-md-4">
                                                 <label>Purchase Price</label>
-                                                <input type="text" class="form-control">
+                                                <input type="text" id="purchasePrice" class="form-control" readonly>
                                             </div>
                                             <div class="col-md-4">
                                                 <label>Qty</label>
-                                                <input type="text" class="form-control">
+                                                <input type="number" id="qty" class="form-control" min="1">
                                             </div>
                                             <div class="col-md-4">
                                                 <label>Total Price</label>
-                                                <input type="text" class="form-control" readonly>
+                                                <input type="text" id="totalPrice" class="form-control" readonly>
                                             </div>
                                         </div>
 
-                                        <button type="submit" role="button" class="btn btn-icon-split btn-primary">
+                                        <button type="button" id="addItemBtn" class="btn btn-icon-split btn-primary"
+                                            onclick="addItem()">
                                             <span class="icon text-white-50">
                                                 <i class="fa fa-plus"></i>
                                             </span>
@@ -107,7 +116,7 @@
                                     </div>
 
                                     <div class="table-responsive">
-                                        <table class="table mt-3">
+                                        <table class="table table-striped mt-3">
                                             <thead class="">
                                                 <tr>
                                                     <th>No.</th>
@@ -119,10 +128,38 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr style="background-color: darkgrey;">
-                                                    <td colspan="6" class="text-center">no items</td>
-                                                </tr>
+                                                <% if (purchase.PurchaseItems && purchase.PurchaseItems.length> 0) { %>
+                                                    <% purchase.PurchaseItems.forEach((item, index)=> { %>
+                                                        <tr>
+                                                            <td>
+                                                                <%= index + 1 %>
+                                                            </td>
+                                                            <td>
+                                                                <%= item.itemcode %>
+                                                            </td>
+                                                            <td>
+                                                                <%= item.Good?.name || '' %>
+                                                            </td>
+                                                            <td>
+                                                                <%= item.quantity %>
+                                                            </td>
+                                                            <td>
+                                                                <%= Number(item.purchaseprice).toLocaleString('id-ID', {
+                                                                    style: 'currency' , currency: 'IDR' }) %>
+                                                            </td>
+                                                            <td>
+                                                                <%= Number(item.totalprice).toLocaleString('id-ID', {
+                                                                    style: 'currency' , currency: 'IDR' }) %>
+                                                            </td>
+                                                        </tr>
+                                                        <% }) %>
+                                                            <% } else { %>
+                                                                <tr>
+                                                                    <td colspan="6" class="text-center">no items</td>
+                                                                </tr>
+                                                                <% } %>
                                             </tbody>
+
                                         </table>
                                     </div>
 
@@ -131,13 +168,20 @@
                                             <label for="totalsum" class="col-sm-2 col-form-label">Total
                                                 Summary</label>
                                             <div class="col-sm-10">
-                                                <input type="number" class="form-control" id="totalsum" name="totalsum">
+                                                <input type="number" class="form-control" id="totalsum" name="totalsum"
+                                                    value="<%= totalsum %>" readonly>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
-                                            <label for="supplier" class="col-sm-2 col-form-label">Supplier</label>
+                                            <label for="supplierSelect" class="col-sm-2 col-form-label">Supplier</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="supplier" name="supplier">
+                                                <select class="form-control" id="supplierSelect" name="supplier">
+                                                    <% suppliers.forEach(supplier=> { %>
+                                                        <option value="<%= supplier.id %>">
+                                                            <%= supplier.name %>
+                                                        </option>
+                                                        <% }); %>
+                                                </select>
                                             </div>
                                         </div>
 
@@ -175,6 +219,125 @@
             <%- include('../partials/logout-modal.ejs') %>
 
                 <%- include('../partials/core-scripts.ejs') %>
+
+                    <script type="application/json" id="goods-data">
+                        <%- JSON.stringify(goods) %>
+                    </script>
+
+                    <script>
+                        const goodsData = JSON.parse(document.getElementById('goods-data').textContent);
+
+                        const barcodeSelect = document.getElementById('barcodeSelect')
+                        const goodNameInput = document.getElementById('goodName')
+                        const stockInput = document.getElementById('stock')
+                        const purchasePriceInput = document.getElementById('purchasePrice')
+                        const quantityInput = document.getElementById('qty')
+                        const totalPriceInput = document.getElementById('totalPrice');
+
+                        let selectedGood = null
+
+                        console.log('Goods Data:', goodsData)
+
+                        barcodeSelect.addEventListener('change', function () {
+                            const selectedBarcode = this.value;
+                            const selectedGood = goodsData.find(g => g.barcode === selectedBarcode);
+                            console.log('Selected Good:', selectedGood);
+
+                            if (selectedGood) {
+                                goodNameInput.value = selectedGood.name;
+                                stockInput.value = selectedGood.stock;
+                                purchasePriceInput.value = selectedGood.purchaseprice;
+                                calculateTotal()
+                            } else {
+                                goodNameInput.value = '';
+                                stockInput.value = '';
+                                purchasePriceInput.value = '';
+                            }
+                        });
+
+                        quantityInput.addEventListener('input', calculateTotal)
+
+                        function calculateTotal() {
+                            const price = parseFloat(purchasePriceInput.value)
+                            const qty = parseFloat(quantityInput.value)
+
+                            if (!isNaN(price) && !isNaN(qty)) {
+                                const total = price * qty;
+                                totalPriceInput.value = total.toLocaleString('id-ID', {
+                                    style: 'currency',
+                                    currency: 'IDR'
+                                });
+                            } else {
+                                totalPriceInput.value = '';
+                            }
+                        }
+
+
+
+                        barcodeSelect.dispatchEvent(new Event('change'));
+
+                        // Handle add item
+
+                        function addItem() {
+                            const invoice = document.getElementById('invoice').value;
+                            const itemcode = barcodeSelect.value;
+                            const quantity = parseInt(quantityInput.value);
+                            const purchaseprice = parseFloat(purchasePriceInput.value);
+                            const totalprice = purchaseprice * quantity;
+
+                            if (!itemcode || !quantity || quantity <= 0 || isNaN(totalprice)) {
+                                alert('Isi data item dengan benar.');
+                                return;
+                            }
+
+                            const body = new URLSearchParams();
+                            body.append('itemcode', itemcode);
+                            body.append('quantity', quantity);
+                            body.append('purchaseprice', purchaseprice);
+                            body.append('totalprice', totalprice);
+
+                            fetch(`/purchases/edit/${invoice}/item`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                body: body.toString()
+                            })
+                                .then(res => {
+                                    if (!res.ok) {
+                                        return res.json().then(err => { throw new Error(err.error); });
+                                    }
+                                    return res.json();
+                                })
+                                .then(item => {
+                                    const tbody = document.querySelector('table tbody');
+                                    if (tbody.querySelector('td.text-center')) {
+                                        tbody.innerHTML = '';
+                                    }
+
+                                    const tr = document.createElement('tr');
+                                    const rowCount = tbody.rows.length + 1;
+                                    tr.innerHTML = `
+                <td>${rowCount}</td>
+                <td>${item.itemcode}</td>
+                <td>${goodNameInput.value}</td>
+                <td>${item.quantity}</td>
+                <td>${Number(item.purchaseprice).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
+                <td>${Number(item.totalprice).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
+            `;
+                                    tbody.appendChild(tr);
+
+                                    const totalSumInput = document.getElementById('totalsum');
+                                    const currentTotal = parseFloat(totalSumInput.value) || 0;
+                                    totalSumInput.value = currentTotal + totalprice;
+
+                                    quantityInput.value = '';
+                                    totalPriceInput.value = '';
+                                })
+                                .catch(err => {
+                                    alert('Gagal tambah item: ' + err.message);
+                                });
+                        }
+
+                    </script>
 
 </body>
 

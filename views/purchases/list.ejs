@@ -71,7 +71,33 @@
                                             </thead>
                                             <tbody>
 
-
+                                                <% purchases.forEach(purchase=> { %>
+                                                    <tr>
+                                                        <td>
+                                                            <%= purchase.invoice %>
+                                                        </td>
+                                                        <td>
+                                                            <%= moment(purchase.time).format('DD MMM YYYY HH:mm:ss') %>
+                                                        </td>
+                                                        <td>
+                                                            <%= purchase.totalsum %>
+                                                        </td>
+                                                        <td>
+                                                            <%= purchase.Supplier.name %>
+                                                        </td>
+                                                        <td>
+                                                            <a href="/purchases/edit/<%= purchase.invoice %>"
+                                                                class="btn btn-circle btn-success">
+                                                                <i class="fa fa-info-circle"></i>
+                                                            </a>
+                                                            <button class="btn btn-circle btn-danger"
+                                                                data-toggle="modal" data-target="#deleteModal"
+                                                                data-id="<%= purchase.invoice %>">
+                                                                <i class="fa fa-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                    <% }); %>
 
                                             </tbody>
                                             <tfoot>
