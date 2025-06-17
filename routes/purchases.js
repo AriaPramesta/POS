@@ -2,20 +2,78 @@ var express = require('express');
 const { isLoggedIn } = require('../helper/util');
 const { Purchase, Supplier, User, Good, PurchaseItem } = require('../models')
 const moment = require('moment');
-const { where } = require('sequelize');
+const { Op } = require('sequelize');
 var router = express.Router();
 
 module.exports = function (db) {
     router.get('/', isLoggedIn, async function (req, res) {
+        const { limit, sortBy, sortMode, search } = req.query;
+
+        if (!limit || !sortBy || !sortMode || search === undefined) {
+            const query = {
+                limit: limit || 3,
+                sortBy: sortBy || 'invoice',
+                sortMode: sortMode || 'DESC',
+                search: search !== undefined ? search : ''
+            };
+
+            const queryString = new URLSearchParams(query).toString();
+            return res.redirect(`/purchases?${queryString}`);
+        }
+
         try {
-            const purchases = await Purchase.findAll({
+            const { page = 1 } = req.query
+            const keyword = req.query.search
+            const limit = +req.query.limit || 3
+            const offset = limit * (page - 1)
+
+            const sortBy = req.query.sortBy || 'invoice';
+            const sortMode = req.query.sortMode?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
+
+            whereClause = {}
+
+            if (keyword) {
+                {
+                    whereClause = {
+                        [Op.or]: [
+                            { invoice: { [Op.iLike]: `%${keyword}%` } }
+                        ]
+                    }
+                }
+            }
+
+            const { count: totalPurchases, rows: purchases } = await Purchase.findAndCountAll({
+                where: whereClause,
+                order: [[sortBy, sortMode]],
+                limit,
+                offset,
                 include: [
                     {
                         model: Supplier
                     }
                 ]
             })
-            res.render('purchases/list', { user: req.session.user, purchases, moment })
+            const pages = Math.ceil(totalPurchases / limit)
+
+            const query = { ...req.query };
+            delete query.page;
+            const queryString = new URLSearchParams(query).toString();
+            const baseUrl = `/purchases?${queryString}`;
+
+            res.render('purchases/list', {
+                user: req.session.user,
+                purchases,
+                moment,
+                search: keyword,
+                currentPage: +page,
+                pages,
+                sortBy,
+                sortMode,
+                limit,
+                offset,
+                baseUrl,
+                totalPurchases
+            })
         } catch (error) {
             console.log(error)
         }
