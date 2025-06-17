@@ -106,6 +106,7 @@ module.exports = function (db) {
 
         try {
             await Purchase.destroy({ where: { invoice } });
+            res.redirect('/purchases')
         } catch (err) {
             console.error(err);
             res.status(500).send('Gagal menghapus item');

@@ -15,7 +15,9 @@ module.exports = {
         references: {
           model: 'Purchases',
           key: 'invoice'
-        }
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
       },
       itemcode: {
         type: Sequelize.STRING(20),
@@ -23,7 +25,9 @@ module.exports = {
         references: {
           model: 'Goods',
           key: 'barcode'
-        }
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
       },
       quantity: {
         type: Sequelize.INTEGER,

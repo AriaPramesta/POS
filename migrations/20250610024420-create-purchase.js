@@ -23,7 +23,9 @@ module.exports = {
         references: {
           model: 'Suppliers',
           key: 'supplierid'
-        }
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
       },
       operator: {
         type: Sequelize.INTEGER,
@@ -31,7 +33,9 @@ module.exports = {
         references: {
           model: 'Users',
           key: 'id'
-        }
+        },
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
       },
       createdAt: {
         allowNull: false,
