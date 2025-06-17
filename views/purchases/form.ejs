@@ -229,113 +229,115 @@
 
             <%- include('../partials/logout-modal.ejs') %>
 
-                <%- include('../partials/core-scripts.ejs') %>
+                <%- include('../partials/delete-modal.ejs') %>
 
-                    <script>
-                        $('#deleteModal').on('show.bs.modal', function (event) {
-                            const button = $(event.relatedTarget);
-                            const id = button.data('id');
-                            $('#deleteForm').attr('action', `/purchases/delete/${id}/item`);
-                        });
-                    </script>
+                    <%- include('../partials/core-scripts.ejs') %>
+
+                        <script>
+                            $('#deleteModal').on('show.bs.modal', function (event) {
+                                const button = $(event.relatedTarget);
+                                const id = button.data('id');
+                                $('#deleteForm').attr('action', `/purchases/delete/${id}/item`);
+                            });
+                        </script>
 
 
-                    <script type="application/json" id="goods-data">
+                        <script type="application/json" id="goods-data">
                         <%- JSON.stringify(goods) %>
                     </script>
 
-                    <script>
-                        const goodsData = JSON.parse(document.getElementById('goods-data').textContent);
+                        <script>
+                            const goodsData = JSON.parse(document.getElementById('goods-data').textContent);
 
-                        const barcodeSelect = document.getElementById('barcodeSelect')
-                        const goodNameInput = document.getElementById('goodName')
-                        const stockInput = document.getElementById('stock')
-                        const purchasePriceInput = document.getElementById('purchasePrice')
-                        const quantityInput = document.getElementById('qty')
-                        const totalPriceInput = document.getElementById('totalPrice');
+                            const barcodeSelect = document.getElementById('barcodeSelect')
+                            const goodNameInput = document.getElementById('goodName')
+                            const stockInput = document.getElementById('stock')
+                            const purchasePriceInput = document.getElementById('purchasePrice')
+                            const quantityInput = document.getElementById('qty')
+                            const totalPriceInput = document.getElementById('totalPrice');
 
-                        let selectedGood = null
+                            let selectedGood = null
 
-                        console.log('Goods Data:', goodsData)
+                            console.log('Goods Data:', goodsData)
 
-                        barcodeSelect.addEventListener('change', function () {
-                            const selectedBarcode = this.value;
-                            const selectedGood = goodsData.find(g => g.barcode === selectedBarcode);
-                            console.log('Selected Good:', selectedGood);
+                            barcodeSelect.addEventListener('change', function () {
+                                const selectedBarcode = this.value;
+                                const selectedGood = goodsData.find(g => g.barcode === selectedBarcode);
+                                console.log('Selected Good:', selectedGood);
 
-                            if (selectedGood) {
-                                goodNameInput.value = selectedGood.name;
-                                stockInput.value = selectedGood.stock;
-                                purchasePriceInput.value = selectedGood.purchaseprice;
-                                calculateTotal()
-                            } else {
-                                goodNameInput.value = '';
-                                stockInput.value = '';
-                                purchasePriceInput.value = '';
-                            }
-                        });
+                                if (selectedGood) {
+                                    goodNameInput.value = selectedGood.name;
+                                    stockInput.value = selectedGood.stock;
+                                    purchasePriceInput.value = selectedGood.purchaseprice;
+                                    calculateTotal()
+                                } else {
+                                    goodNameInput.value = '';
+                                    stockInput.value = '';
+                                    purchasePriceInput.value = '';
+                                }
+                            });
 
-                        quantityInput.addEventListener('input', calculateTotal)
+                            quantityInput.addEventListener('input', calculateTotal)
 
-                        function calculateTotal() {
-                            const price = parseFloat(purchasePriceInput.value)
-                            const qty = parseFloat(quantityInput.value)
+                            function calculateTotal() {
+                                const price = parseFloat(purchasePriceInput.value)
+                                const qty = parseFloat(quantityInput.value)
 
-                            if (!isNaN(price) && !isNaN(qty)) {
-                                const total = price * qty;
-                                totalPriceInput.value = total.toLocaleString('id-ID', {
-                                    style: 'currency',
-                                    currency: 'IDR'
-                                });
-                            } else {
-                                totalPriceInput.value = '';
-                            }
-                        }
-
-
-
-                        barcodeSelect.dispatchEvent(new Event('change'));
-
-                        // Handle add item
-
-                        function addItem() {
-                            const invoice = document.getElementById('invoice').value;
-                            const itemcode = barcodeSelect.value;
-                            const quantity = parseInt(quantityInput.value);
-                            const purchaseprice = parseFloat(purchasePriceInput.value);
-                            const totalprice = purchaseprice * quantity;
-
-                            if (!itemcode || !quantity || quantity <= 0 || isNaN(totalprice)) {
-                                alert('Isi data item dengan benar.');
-                                return;
+                                if (!isNaN(price) && !isNaN(qty)) {
+                                    const total = price * qty;
+                                    totalPriceInput.value = total.toLocaleString('id-ID', {
+                                        style: 'currency',
+                                        currency: 'IDR'
+                                    });
+                                } else {
+                                    totalPriceInput.value = '';
+                                }
                             }
 
-                            const body = new URLSearchParams();
-                            body.append('itemcode', itemcode);
-                            body.append('quantity', quantity);
-                            body.append('purchaseprice', purchaseprice);
-                            body.append('totalprice', totalprice);
 
-                            fetch(`/purchases/edit/${invoice}/item`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                                body: body.toString()
-                            })
-                                .then(res => {
-                                    if (!res.ok) {
-                                        return res.json().then(err => { throw new Error(err.error); });
-                                    }
-                                    return res.json();
+
+                            barcodeSelect.dispatchEvent(new Event('change'));
+
+                            // Handle add item
+
+                            function addItem() {
+                                const invoice = document.getElementById('invoice').value;
+                                const itemcode = barcodeSelect.value;
+                                const quantity = parseInt(quantityInput.value);
+                                const purchaseprice = parseFloat(purchasePriceInput.value);
+                                const totalprice = purchaseprice * quantity;
+
+                                if (!itemcode || !quantity || quantity <= 0 || isNaN(totalprice)) {
+                                    alert('Isi data item dengan benar.');
+                                    return;
+                                }
+
+                                const body = new URLSearchParams();
+                                body.append('itemcode', itemcode);
+                                body.append('quantity', quantity);
+                                body.append('purchaseprice', purchaseprice);
+                                body.append('totalprice', totalprice);
+
+                                fetch(`/purchases/edit/${invoice}/item`, {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                                    body: body.toString()
                                 })
-                                .then(item => {
-                                    const tbody = document.querySelector('table tbody');
-                                    if (tbody.querySelector('td.text-center')) {
-                                        tbody.innerHTML = '';
-                                    }
+                                    .then(res => {
+                                        if (!res.ok) {
+                                            return res.json().then(err => { throw new Error(err.error); });
+                                        }
+                                        return res.json();
+                                    })
+                                    .then(item => {
+                                        const tbody = document.querySelector('table tbody');
+                                        if (tbody.querySelector('td.text-center')) {
+                                            tbody.innerHTML = '';
+                                        }
 
-                                    const tr = document.createElement('tr');
-                                    const rowCount = tbody.rows.length + 1;
-                                    tr.innerHTML = `
+                                        const tr = document.createElement('tr');
+                                        const rowCount = tbody.rows.length + 1;
+                                        tr.innerHTML = `
                 <td>${rowCount}</td>
                 <td>${item.itemcode}</td>
                 <td>${goodNameInput.value}</td>
@@ -343,62 +345,62 @@
                 <td>${Number(item.purchaseprice).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
                 <td>${Number(item.totalprice).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
             `;
-                                    tbody.appendChild(tr);
+                                        tbody.appendChild(tr);
 
-                                    const totalSumInput = document.getElementById('totalsum');
-                                    const currentTotal = parseFloat(totalSumInput.value) || 0;
-                                    totalSumInput.value = currentTotal + totalprice;
+                                        const totalSumInput = document.getElementById('totalsum');
+                                        const currentTotal = parseFloat(totalSumInput.value) || 0;
+                                        totalSumInput.value = currentTotal + totalprice;
 
-                                    quantityInput.value = '';
-                                    totalPriceInput.value = '';
-                                })
-                                .catch(err => {
-                                    alert('Gagal tambah item: ' + err.message);
-                                });
-                        }
-
-                        // Handle edit purchase
-
-                        function submitPurchase() {
-                            const invoice = document.getElementById('invoice').value;
-                            const time = document.getElementById('time').value
-                            const supplier = document.getElementById('supplierSelect').value;
-                            const totalsum = parseFloat(document.getElementById('totalsum').value);
-
-                            console.log('Supplier:', supplier);
-                            console.log('Type:', typeof supplier);
-
-
-                            if (!supplier) {
-                                alert('Supplier harus diisi.');
-                                return;
+                                        quantityInput.value = '';
+                                        totalPriceInput.value = '';
+                                    })
+                                    .catch(err => {
+                                        alert('Gagal tambah item: ' + err.message);
+                                    });
                             }
 
-                            const body = new URLSearchParams();
-                            body.append('time', time);
-                            body.append('supplier', supplier);
-                            body.append('totalsum', totalsum);
+                            // Handle edit purchase
 
-                            fetch(`/purchases/edit/${invoice}`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/x-www-form-urlencoded'
-                                },
-                                body: body.toString()
-                            })
-                                .then(res => {
-                                    if (!res.ok) throw new Error('Gagal menyimpan transaksi.');
-                                    return res.text();
-                                })
-                                .then(() => {
-                                    window.location.href = '/purchases';
-                                })
-                                .catch(err => {
-                                    alert('Error: ' + err.message);
-                                });
-                        }
+                            function submitPurchase() {
+                                const invoice = document.getElementById('invoice').value;
+                                const time = document.getElementById('time').value
+                                const supplier = document.getElementById('supplierSelect').value;
+                                const totalsum = parseFloat(document.getElementById('totalsum').value);
 
-                    </script>
+                                console.log('Supplier:', supplier);
+                                console.log('Type:', typeof supplier);
+
+
+                                if (!supplier) {
+                                    alert('Supplier harus diisi.');
+                                    return;
+                                }
+
+                                const body = new URLSearchParams();
+                                body.append('time', time);
+                                body.append('supplier', supplier);
+                                body.append('totalsum', totalsum);
+
+                                fetch(`/purchases/edit/${invoice}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded'
+                                    },
+                                    body: body.toString()
+                                })
+                                    .then(res => {
+                                        if (!res.ok) throw new Error('Gagal menyimpan transaksi.');
+                                        return res.text();
+                                    })
+                                    .then(() => {
+                                        window.location.href = '/purchases';
+                                    })
+                                    .catch(err => {
+                                        alert('Error: ' + err.message);
+                                    });
+                            }
+
+                        </script>
 
 </body>
 
