@@ -226,6 +226,14 @@
             <%- include('../partials/logout-modal.ejs') %>
                 <%- include('../partials/delete-modal.ejs') %>
                     <%- include('../partials/core-scripts.ejs') %>
+
+                        <script>
+                            $('#deleteModal').on('show.bs.modal', function (event) {
+                                const button = $(event.relatedTarget);
+                                const id = button.data('id');
+                                $('#deleteForm').attr('action', '/suppliers/delete/' + id);
+                            });
+                        </script>
 </body>
 
 </html>
