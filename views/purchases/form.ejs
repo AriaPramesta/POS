@@ -256,6 +256,7 @@
                             const quantityInput = document.getElementById('qty')
                             const totalPriceInput = document.getElementById('totalPrice');
 
+
                             let selectedGood = null
 
                             console.log('Goods Data:', goodsData)
@@ -358,6 +359,7 @@
                                         const currentTotal = parseFloat(totalSumInput.value) || 0;
                                         totalSumInput.value = currentTotal + totalprice;
 
+                                        document.getElementById('stock').value = parseInt(document.getElementById('stock').value) + quantity
                                         quantityInput.value = '';
                                         totalPriceInput.value = '';
                                     })

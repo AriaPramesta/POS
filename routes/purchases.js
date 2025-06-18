@@ -110,7 +110,7 @@ module.exports = function (db) {
                     }
                 ]
             })
-            console.log('Purchase', purchase)
+            console.log('Purchase', JSON.stringify(purchase))
 
             const suppliers = await Supplier.findAll()
 
