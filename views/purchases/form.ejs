@@ -175,8 +175,9 @@
                                             <label for="totalsum" class="col-sm-2 col-form-label">Total
                                                 Summary</label>
                                             <div class="col-sm-10">
-                                                <input type="number" class="form-control" id="totalsum" name="totalsum"
-                                                    value="<%= totalsum %>" readonly>
+                                                <input type="text" class="form-control" id="totalsum" name="totalsum"
+                                                    value="<%= Number(totalsum).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) %>"
+                                                    readonly>
                                             </div>
                                         </div>
                                         <div class="row mb-3">
@@ -356,8 +357,11 @@
                                         tbody.appendChild(tr);
 
                                         const totalSumInput = document.getElementById('totalsum');
-                                        const currentTotal = parseFloat(totalSumInput.value) || 0;
-                                        totalSumInput.value = currentTotal + totalprice;
+                                        const rawValue = totalSumInput.value;  // misal: "Rp 1.500,00"
+                                        const cleanedValue = rawValue.replace(/[^\d,]/g, '').replace(',', '.');
+                                        const currentTotal = parseFloat(cleanedValue) || 0;
+                                        const totalsumVal = currentTotal + totalprice;
+                                        totalSumInput.value = Number(totalsumVal).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })
 
                                         document.getElementById('stock').value = parseInt(document.getElementById('stock').value) + quantity
                                         quantityInput.value = '';
@@ -374,11 +378,6 @@
                                 const invoice = document.getElementById('invoice').value;
                                 const time = document.getElementById('time').value
                                 const supplier = document.getElementById('supplierSelect').value;
-                                const totalsum = parseFloat(document.getElementById('totalsum').value);
-
-                                console.log('Supplier:', supplier);
-                                console.log('Type:', typeof supplier);
-
 
                                 if (!supplier) {
                                     alert('Supplier harus diisi.');
@@ -388,7 +387,6 @@
                                 const body = new URLSearchParams();
                                 body.append('time', time);
                                 body.append('supplier', supplier);
-                                body.append('totalsum', totalsum);
 
                                 fetch(`/purchases/edit/${invoice}`, {
                                     method: 'POST',
