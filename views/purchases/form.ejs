@@ -176,7 +176,7 @@
                                                 Summary</label>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="totalsum" name="totalsum"
-                                                    value="<%= Number(totalsum).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) %>"
+                                                    value="<%= Number(purchase.totalsum).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) %>"
                                                     readonly>
                                             </div>
                                         </div>
@@ -331,7 +331,7 @@
                                         }
                                         return res.json();
                                     })
-                                    .then(item => {
+                                    .then(data => {
                                         const tbody = document.querySelector('table tbody');
                                         if (tbody.querySelector('td.text-center')) {
                                             tbody.innerHTML = '';
@@ -341,29 +341,24 @@
                                         const rowCount = tbody.rows.length + 1;
                                         tr.innerHTML = `
                 <td>${rowCount}</td>
-                <td>${item.itemcode}</td>
+                <td>${data.item.itemcode}</td>
                 <td>${goodNameInput.value}</td>
-                <td>${item.quantity}</td>
-                <td>${Number(item.purchaseprice).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
-                <td>${Number(item.totalprice).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
+                <td>${data.item.quantity}</td>
+                <td>${Number(data.item.purchaseprice).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
+                <td>${Number(data.item.totalprice).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
                 <td>
                     <button class="btn btn-circle btn-danger" type="button"
                         data-toggle="modal" data-target="#deleteModal"
-                        data-id="${item.id}">
+                        data-id="${data.item.id}">
                         <i class="fa fa-trash"></i>
                     </button>
                 </td>
             `;
                                         tbody.appendChild(tr);
 
-                                        const totalSumInput = document.getElementById('totalsum');
-                                        const rawValue = totalSumInput.value;  // misal: "Rp 1.500,00"
-                                        const cleanedValue = rawValue.replace(/[^\d,]/g, '').replace(',', '.');
-                                        const currentTotal = parseFloat(cleanedValue) || 0;
-                                        const totalsumVal = currentTotal + totalprice;
-                                        totalSumInput.value = Number(totalsumVal).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })
+                                        document.getElementById('totalsum').value = Number(data.purchase.totalsum).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })
 
-                                        document.getElementById('stock').value = parseInt(document.getElementById('stock').value) + quantity
+                                        document.getElementById('stock').value = data.item.Good.stock
                                         quantityInput.value = '';
                                         totalPriceInput.value = '';
                                     })

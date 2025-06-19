@@ -116,12 +116,10 @@ module.exports = function (db) {
 
             const goods = await Good.findAll()
 
-            const totalsum = purchase.PurchaseItems?.reduce((sum, item) => sum + Number(item.totalprice), 0) || 0;
-
             const now = moment();;
             const currentDateTime = now.format('DD MMM YYYY HH:mm:ss');
 
-            res.render('purchases/form', { user: req.session.user, purchase, currentDateTime, goods, suppliers, totalsum })
+            res.render('purchases/form', { user: req.session.user, purchase, currentDateTime, goods, suppliers })
         } catch (error) {
             console.log(error)
         }
@@ -132,8 +130,16 @@ module.exports = function (db) {
         const { itemcode, quantity, purchaseprice, totalprice } = req.body
 
         try {
-            const item = await PurchaseItem.create({ invoice, itemcode, quantity, purchaseprice, totalprice })
-            res.status(201).json(item)
+            const purchaseItem = await PurchaseItem.create({ invoice, itemcode, quantity, purchaseprice, totalprice })
+            const item = await PurchaseItem.findOne({
+                where: { id: purchaseItem.id },
+                include: [{
+                    model: Good,
+                    attributes: ['stock']
+                }]
+            })
+            const purchase = await Purchase.findByPk(item.invoice)
+            res.status(201).json({ purchase, item })
         } catch (error) {
             console.log(err)
             res.status(400).json({ error: err.message });
