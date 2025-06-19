@@ -21,6 +21,12 @@ module.exports = (sequelize, DataTypes) => {
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
       })
+
+      Sale.hasMany(models.SaleItem, {
+        foreignKey: 'invoice',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+      })
     }
   }
   Sale.init({
@@ -29,7 +35,10 @@ module.exports = (sequelize, DataTypes) => {
       primaryKey: true,
       type: DataTypes.STRING(20)
     },
-    time: DataTypes.DATE,
+    time: {
+      type: DataTypes.DATE,
+      defaultValue: sequelize.literal('NOW()'),
+    },
     totalsum: DataTypes.DECIMAL(19, 2),
     pay: DataTypes.DECIMAL(19, 2),
     change: DataTypes.DECIMAL(19, 2),

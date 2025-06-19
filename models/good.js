@@ -14,8 +14,15 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'unit',
         onDelete: 'RESTRICT',
         onUpdate: 'CASCADE'
-      });
+      })
+
       Good.hasMany(models.PurchaseItem, {
+        foreignKey: 'itemcode',
+        onDelete: 'CASCADE',
+        onUpdate: 'CASCADE'
+      })
+
+      Good.hasMany(models.SaleItem, {
         foreignKey: 'itemcode',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
