@@ -204,5 +204,49 @@ module.exports = function (db) {
         }
     });
 
+    router.post('/delete/:id/item', isLoggedIn, async (req, res) => {
+        const { id } = req.params;
+
+        const t = await sequelize.transaction();
+
+        try {
+            const item = await SaleItem.findOne({
+                where: { id },
+                include: [{ model: Good }],
+                transaction: t
+            });
+
+            if (!item) throw new Error('Item tidak ditemukan');
+
+            const invoice = item.invoice;
+            const quantity = item.quantity;
+
+            const good = item.Good;
+            await good.update(
+                { stock: good.stock + quantity },
+                { transaction: t }
+            );
+
+            await SaleItem.destroy({ where: { id }, transaction: t });
+
+            const items = await SaleItem.findAll({
+                where: { invoice },
+                transaction: t
+            });
+
+            const totalsum = items.reduce((sum, item) => sum + parseFloat(item.totalprice), 0);
+
+            await Sale.update({ totalsum }, { where: { invoice }, transaction: t });
+
+            await t.commit();
+            res.redirect('back');
+        } catch (err) {
+            await t.rollback();
+            console.error(err);
+            res.status(500).send('Gagal menghapus item');
+        }
+    });
+
+
     return router;
 }

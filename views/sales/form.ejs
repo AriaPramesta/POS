@@ -252,7 +252,7 @@
                             $('#deleteModal').on('show.bs.modal', function (event) {
                                 const button = $(event.relatedTarget);
                                 const id = button.data('id');
-                                $('#deleteForm').attr('action', `/purchases/delete/${id}/item`);
+                                $('#deleteForm').attr('action', `/sales/delete/${id}/item`);
                             });
                         </script>
 
