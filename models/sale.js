@@ -11,7 +11,7 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       Sale.belongsTo(models.Customer, {
-        foreignKey: 'customerid',
+        foreignKey: 'customer',
         onDelete: 'CASCADE',
         onUpdate: 'CASCADE'
       })
