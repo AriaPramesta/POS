@@ -163,12 +163,6 @@ module.exports = function (db) {
                 totalprice
             }, { transaction: t });
 
-            const item = await SaleItem.findOne({
-                where: { id: saleItems.id },
-                include: [{ model: Good }],
-                transaction: t
-            });
-
             const newStock = good.stock - quantity;
             await good.update({ stock: newStock }, { transaction: t });
 
@@ -185,6 +179,12 @@ module.exports = function (db) {
 
             await t.commit();
 
+            const item = await SaleItem.findOne({
+                where: { id: saleItems.id },
+                include: [{ model: Good }],
+                transaction: t
+            });
+
             res.status(201).json({ item, totalsum, good });
         } catch (error) {
             await t.rollback();
@@ -193,6 +193,26 @@ module.exports = function (db) {
         }
     });
 
+    router.post('/edit/:invoice', isLoggedIn, async (req, res) => {
+        const invoice = req.params.invoice
+        const { pay } = req.body
+
+        const t = await sequelize.transaction();
+        try {
+            const item = await Sale.findOne({ where: { invoice } }, { transaction: t })
+
+            const change = pay - item.totalsum
+
+            await Sale.update({ pay, change }, { where: { invoice }, transaction: t })
+
+            await t.commit();
+
+            res.json(change)
+        } catch (error) {
+            await t.rollback();
+            console.log(error)
+        }
+    });
 
     router.post('/delete/:invoice', isLoggedIn, async (req, res) => {
         try {

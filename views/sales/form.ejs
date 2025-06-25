@@ -181,22 +181,21 @@
                                             </div>
                                         </div>
                                         <div class="row mb-3">
-                                            <label for="totalsum" class="col-sm-2 col-form-label">Pay</label>
+                                            <label for="pay" class="col-sm-2 col-form-label">Pay</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="totalsum" name="totalsum"
-                                                    value="<%= Number(sale.pay).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) %>"
+                                                <input type="text" class="form-control" id="pay" name="pay"
+                                                    value="<%= sale.pay > 0 ? sale.pay : '' %>">
+                                            </div>
+                                        </div>
+                                        <div class=" row mb-3">
+                                            <label for="change" class="col-sm-2 col-form-label">Change</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" class="form-control" id="change" name="change"
+                                                    value="<%= sale.change > 0 ? Number(sale.change).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) : '' %>"
                                                     readonly>
                                             </div>
                                         </div>
-                                        <div class="row mb-3">
-                                            <label for="totalsum" class="col-sm-2 col-form-label">Change</label>
-                                            <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="totalsum" name="totalsum"
-                                                    value="<%= Number(sale.change).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' }) %>"
-                                                    readonly>
-                                            </div>
-                                        </div>
-                                        <div class="row mb-3">
+                                        <div class=" row mb-3">
                                             <label for="supplierSelect" class="col-sm-2 col-form-label">Customer</label>
                                             <div class="col-sm-10">
                                                 <select class="form-control" id="supplierSelect" name="supplier">
@@ -211,12 +210,12 @@
                                             </div>
                                         </div>
 
-                                        <button type="button" class="btn btn-icon-split btn-success">
+                                        <a href="/sales" class="btn btn-icon-split btn-success">
                                             <span class="icon text-white-50">
                                                 <i class="fa fa-plus"></i>
                                             </span>
                                             <span class="text">Finish</span>
-                                        </button>
+                                        </a>
                                         <a href="/sales" role="button" class="btn btn-icon-split btn-warning">
                                             <span class="icon text-white-50">
                                                 <i class="fa fa-arrow-left"></i>
@@ -368,6 +367,33 @@
                                         alert('Gagal tambah item: ' + err.message);
                                     });
                             }
+
+
+                            const payInput = document.getElementById('pay');
+                            const invoice = document.getElementById('invoice').value;
+                            const changeInput = document.getElementById('change');
+
+                            payInput.addEventListener('input', async () => {
+                                const payValue = payInput.value;
+
+                                const response = await fetch(`/sales/edit/${invoice}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({ pay: payValue })
+                                });
+
+                                const change = await response.json();
+
+                                changeInput.value = Number(change).toLocaleString('id-ID', {
+                                    style: 'currency',
+                                    currency: 'IDR'
+                                });
+
+                            });
+
+
                         </script>
 
 
