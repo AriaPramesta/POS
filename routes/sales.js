@@ -181,8 +181,7 @@ module.exports = function (db) {
 
             const item = await SaleItem.findOne({
                 where: { id: saleItems.id },
-                include: [{ model: Good }],
-                transaction: t
+                include: [{ model: Good }]
             });
 
             res.status(201).json({ item, totalsum, good });
@@ -215,14 +214,54 @@ module.exports = function (db) {
     });
 
     router.post('/delete/:invoice', isLoggedIn, async (req, res) => {
+        const invoice = req.params.invoice;
+        const t = await sequelize.transaction();
+
         try {
-            await Sale.destroy({ where: { invoice: req.params.invoice } });
+            const sale = await Sale.findOne({
+                where: { invoice },
+                include: [{
+                    model: SaleItem,
+                    include: [Good]
+                }],
+                transaction: t
+            });
+
+            if (!sale || !sale.SaleItems || sale.SaleItems.length === 0) {
+                await t.rollback();
+                return res.status(404).send('Transaksi tidak ditemukan atau kosong');
+            }
+
+            for (const item of sale.SaleItems) {
+                if (item.Good) {
+                    const updatedStock = item.Good.stock + item.quantity;
+
+                    await item.Good.update(
+                        { stock: updatedStock },
+                        { transaction: t }
+                    );
+                }
+
+                await SaleItem.destroy({
+                    where: { id: item.id },
+                    transaction: t
+                });
+            }
+
+            await Sale.destroy({
+                where: { invoice },
+                transaction: t
+            });
+
+            await t.commit();
             res.redirect('/sales');
         } catch (err) {
+            if (!t.finished) await t.rollback();
             console.error(err);
-            res.status(500).send('Gagal menghapus item');
+            res.status(500).send('Terjadi kesalahan saat menghapus data');
         }
     });
+
 
     router.post('/delete/:id/item', isLoggedIn, async (req, res) => {
         const { id } = req.params;
