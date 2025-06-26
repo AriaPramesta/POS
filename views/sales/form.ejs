@@ -107,7 +107,7 @@
                                         </div>
 
                                         <button type="button" id="addItemBtn" class="btn btn-icon-split btn-primary"
-                                            onclick="addItem()">
+                                            onclick="addItem()" <%=sale.change ? 'disabled' : '' %>>
                                             <span class="icon text-white-50">
                                                 <i class="fa fa-plus"></i>
                                             </span>
@@ -152,9 +152,10 @@
                                                                     style: 'currency' , currency: 'IDR' }) %>
                                                             </td>
                                                             <td>
-                                                                <button class="btn btn-circle btn-danger" type="button"
-                                                                    data-toggle="modal" data-target="#deleteModal"
-                                                                    data-id="<%= item.id %>">
+                                                                <button class="btn btn-circle btn-danger btn-delete"
+                                                                    type="button" data-toggle="modal"
+                                                                    data-target="#deleteModal" data-id="<%= item.id %>"
+                                                                    <%=sale.change ? 'disabled' : '' %>>
                                                                     <i class="fa fa-trash"></i>
                                                                 </button>
                                                             </td>
@@ -184,7 +185,8 @@
                                             <label for="pay" class="col-sm-2 col-form-label">Pay</label>
                                             <div class="col-sm-10">
                                                 <input type="text" class="form-control" id="pay" name="pay"
-                                                    value="<%= sale.pay > 0 ? sale.pay : '' %>">
+                                                    value="<%= sale.pay > 0 ? sale.pay : '' %>" <%=sale.change
+                                                    ? 'readonly' : '' %>>
                                             </div>
                                         </div>
                                         <div class=" row mb-3">
@@ -196,9 +198,10 @@
                                             </div>
                                         </div>
                                         <div class=" row mb-3">
-                                            <label for="supplierSelect" class="col-sm-2 col-form-label">Customer</label>
+                                            <label for="customerSelect" class="col-sm-2 col-form-label">Customer</label>
                                             <div class="col-sm-10">
-                                                <select class="form-control" id="supplierSelect" name="supplier">
+                                                <select class="form-control" id="customerSelect" name="customer"
+                                                    <%=sale.change ? 'disabled' : '' %>>
                                                     <% customers.forEach(customer=> { %>
                                                         <option value="<%= customer.customerid %>"
                                                             <%=sale?.customer==customer.customerid ? 'selected' : '' %>>
@@ -210,12 +213,13 @@
                                             </div>
                                         </div>
 
-                                        <a href="/sales" class="btn btn-icon-split btn-success">
+                                        <button type="button" class="btn btn-icon-split btn-success"
+                                            onclick="submitSale()">
                                             <span class="icon text-white-50">
                                                 <i class="fa fa-plus"></i>
                                             </span>
                                             <span class="text">Finish</span>
-                                        </a>
+                                        </button>
                                         <a href="/sales" role="button" class="btn btn-icon-split btn-warning">
                                             <span class="icon text-white-50">
                                                 <i class="fa fa-arrow-left"></i>
@@ -348,7 +352,7 @@
                 <td>${Number(data.item.sellingprice).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
                 <td>${Number(data.item.totalprice).toLocaleString('id-ID', { style: 'currency', currency: 'IDR' })}</td>
                 <td>
-                    <button class="btn btn-circle btn-danger" type="button"
+                    <button class="btn btn-circle btn-danger btn-delete" type="button"
                         data-toggle="modal" data-target="#deleteModal"
                         data-id="${data.item.id}">
                         <i class="fa fa-trash"></i>
@@ -386,6 +390,11 @@
 
                                 const change = await response.json();
 
+                                document.getElementById('addItemBtn').disabled = true
+                                document.querySelectorAll('.btn-delete').forEach(element => {
+                                    element.disabled = true
+                                });
+
                                 changeInput.value = Number(change).toLocaleString('id-ID', {
                                     style: 'currency',
                                     currency: 'IDR'
@@ -393,6 +402,39 @@
 
                             });
 
+                            function submitSale() {
+                                const invoiceEl = document.getElementById('invoice');
+                                const customerEl = document.getElementById('customerSelect');
+
+                                if (!invoiceEl || !customerEl) {
+                                    alert('Element invoice atau customerSelect tidak ditemukan di halaman!');
+                                    return;
+                                }
+
+                                const invoice = invoiceEl.value;
+                                const customer = customerEl.value;
+
+                                const body = new URLSearchParams();
+                                body.append('customer', customer);
+
+                                fetch(`/sales/edit/${invoice}/customer`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/x-www-form-urlencoded'
+                                    },
+                                    body: body.toString()
+                                })
+                                    .then(res => {
+                                        if (!res.ok) throw new Error('Gagal menyimpan transaksi.');
+                                        return res.text();
+                                    })
+                                    .then(() => {
+                                        window.location.href = '/sales';
+                                    })
+                                    .catch(err => {
+                                        alert('Error: ' + err.message);
+                                    });
+                            }
 
                         </script>
 

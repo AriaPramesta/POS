@@ -85,7 +85,7 @@ module.exports = function (db) {
             const invoice = await generateInvoiceNumber()
             const customer = await Customer.findOne({})
 
-            const sale = await Sale.create({ invoice, totalsum: 0, pay: 0, change: 0, customer: customer.customerid, operator: req.session.user.id })
+            const sale = await Sale.create({ invoice, totalsum: 0, pay: 0, customer: customer.customerid, operator: req.session.user.id })
             res.redirect(`/sales/edit/${sale.invoice}`)
         } catch (error) {
             console.log(error)
@@ -210,6 +210,24 @@ module.exports = function (db) {
         } catch (error) {
             await t.rollback();
             console.log(error)
+        }
+    });
+
+    router.post('/edit/:invoice/customer', isLoggedIn, async (req, res) => {
+        const invoice = req.params.invoice
+        const { customer } = req.body
+
+        const t = await sequelize.transaction();
+        try {
+
+            await Sale.update({ customer }, { where: { invoice }, transaction: t })
+
+            await t.commit();
+            res.send('Customer updated successfully')
+        } catch (error) {
+            await t.rollback();
+            console.log(error)
+            res.status(500).send('Internal server error');
         }
     });
 
