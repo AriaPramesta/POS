@@ -6,69 +6,12 @@ const { Op } = require('sequelize')
 
 module.exports = function (db) {
     router.get('/', isLoggedIn, async function (req, res) {
-        const { limit, sortBy, sortMode, search } = req.query;
-
-        if (!limit || !sortBy || !sortMode || search === undefined) {
-            const query = {
-                limit: limit || 3,
-                sortBy: sortBy || 'supplierid',
-                sortMode: sortMode || 'DESC',
-                search: search !== undefined ? search : ''
-            };
-
-            const queryString = new URLSearchParams(query).toString();
-            return res.redirect(`/suppliers?${queryString}`);
-        }
-
         try {
-            const { page = 1 } = req.query
-            const keyword = req.query.search
-            const limit = +req.query.limit || 3
-            const offset = limit * (page - 1)
-
-            const sortBy = req.query.sortBy || 'supplierid';
-            const sortMode = req.query.sortMode?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-
-            whereClause = {}
-
-            if (keyword) {
-                {
-                    whereClause = {
-                        [Op.or]: [
-                            { name: { [Op.iLike]: `%${keyword}%` } },
-                            { address: { [Op.iLike]: `%${keyword}%` } },
-                            { phone: { [Op.iLike]: `%${keyword}%` } }
-                        ]
-                    }
-                }
-            }
-
-            const { count: totalSuppliers, rows: suppliers } = await Supplier.findAndCountAll({
-                where: whereClause,
-                order: [[sortBy, sortMode]],
-                limit,
-                offset
-            });
-
-            const pages = Math.ceil(totalSuppliers / limit)
-
-            const query = { ...req.query };
-            delete query.page;
-            const queryString = new URLSearchParams(query).toString();
-            const baseUrl = `/suppliers?${queryString}`;
+            const suppliers = await Supplier.findAll();
 
             res.render('suppliers/list', {
                 user: req.session.user,
-                suppliers,
-                search: keyword,
-                currentPage: +page,
-                pages,
-                sortBy,
-                sortMode,
-                limit,
-                offset,
-                baseUrl,
-                totalSuppliers
+                suppliers
             })
         } catch (error) {
             console.log(error)

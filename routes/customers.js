@@ -6,69 +6,12 @@ const { Op } = require('sequelize');
 
 module.exports = function (db) {
     router.get('/', isLoggedIn, async function (req, res) {
-        const { limit, sortBy, sortMode, search } = req.query;
-
-        if (!limit || !sortBy || !sortMode || search === undefined) {
-            const query = {
-                limit: limit || 3,
-                sortBy: sortBy || 'customerid',
-                sortMode: sortMode || 'DESC',
-                search: search !== undefined ? search : ''
-            };
-
-            const queryString = new URLSearchParams(query).toString();
-            return res.redirect(`/customers?${queryString}`);
-        }
-
         try {
-            const { page = 1 } = req.query
-            const keyword = req.query.search
-            const limit = +req.query.limit || 3
-            const offset = limit * (page - 1)
-
-            const sortBy = req.query.sortBy || 'customerid';
-            const sortMode = req.query.sortMode?.toUpperCase() === 'ASC' ? 'ASC' : 'DESC';
-
-            whereClause = {}
-
-            if (keyword) {
-                {
-                    whereClause = {
-                        [Op.or]: [
-                            { name: { [Op.iLike]: `%${keyword}%` } },
-                            { address: { [Op.iLike]: `%${keyword}%` } },
-                            { phone: { [Op.iLike]: `%${keyword}%` } }
-                        ]
-                    }
-                }
-            }
-
-            const { count: totalCustomers, rows: customers } = await Customer.findAndCountAll({
-                where: whereClause,
-                order: [[sortBy, sortMode]],
-                limit,
-                offset
-            });
-
-            const pages = Math.ceil(totalCustomers / limit)
-
-            const query = { ...req.query };
-            delete query.page;
-            const queryString = new URLSearchParams(query).toString();
-            const baseUrl = `/customers?${queryString}`;
+            const customers = await Customer.findAll();
 
             res.render('customers/list', {
                 user: req.session.user,
                 customers,
-                search: keyword,
-                currentPage: +page,
-                pages,
-                sortBy,
-                sortMode,
-                limit,
-                offset,
-                baseUrl,
-                totalCustomers
             })
         } catch (error) {
             console.log(error)
