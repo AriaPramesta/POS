@@ -251,6 +251,55 @@
                     </div>
                   </div>
                 </div>
+
+              </div>
+
+              <div class="card mb-4">
+                <div class="card-header d-flex">
+                  <h6 class="m-0 font-weight-bold text-primary">Earnings Monthly Report</h6>
+                </div>
+                <div class="card-body">
+                  <div>
+                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                      <thead>
+                        <tr>
+                          <th>Bulan</th>
+                          <th>Revenue</th>
+                          <th>Expense</th>
+                          <th>Earning</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+
+                        <% dataTable.forEach(row=> { %>
+                          <tr>
+                            <td>
+                              <%= row.label %>
+                            </td>
+                            <td>
+                              <%= Number(row.expense).toLocaleString() %>
+                            </td>
+                            <td>
+                              <%= Number(row.revenue).toLocaleString() %>
+                            </td>
+                            <td style="color: <%= row.earning < 0 ? 'red' : 'green' %>">
+                              <%= Number(row.earning).toLocaleString() %>
+                            </td>
+                          </tr>
+                          <% }) %>
+
+                      </tbody>
+                      <tfoot>
+                        <tr>
+                          <th>Bulan</th>
+                          <th>Revenue</th>
+                          <th>Expense</th>
+                          <th>Earning</th>
+                        </tr>
+                      </tfoot>
+                    </table>
+                  </div>
+                </div>
               </div>
 
             </div>
