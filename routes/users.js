@@ -1,5 +1,5 @@
 var express = require('express');
-const { isLoggedIn, generatePassword } = require('../helper/util');
+const { isLoggedIn, comparePassword, generatePassword } = require('../helper/util');
 var router = express.Router();
 const { User } = require('../models')
 const { Op } = require('sequelize')
@@ -105,6 +105,51 @@ module.exports = function (db) {
       console.error(error);
       req.flash('errorMessage', 'Failed to update profile');
       res.redirect('/users/profile');
+    }
+  })
+
+  router.get('/changepassword', isLoggedIn, async function (req, res) {
+    try {
+      res.render('users/changepw', {
+        user: req.session.user,
+        errorMessage: req.flash('errorMessage'),
+        successMessage: req.flash('successMessage')
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  router.post('/changepassword', isLoggedIn, async function (req, res) {
+    try {
+      const { oldpw, newpw, repw } = req.body;
+      const userId = req.session.user.id;
+
+      const user = await User.findByPk(userId);
+      const isPasswordValid = comparePassword(oldpw, user.password);
+      if (!isPasswordValid) {
+        req.flash('errorMessage', 'Old password is incorrect');
+        return res.redirect('/users/changepassword');
+      }
+
+      if (newpw !== repw) {
+        req.flash('errorMessage', 'New password and confirmation do not match');
+        return res.redirect('/users/changepassword');
+      }
+
+      const hashedPassword = generatePassword(newpw, 10);
+
+      await User.update(
+        { password: hashedPassword },
+        { where: { id: userId } }
+      );
+
+      req.flash('successMessage', 'Password updated successfully');
+      res.redirect('/users/profile');
+    } catch (error) {
+      console.error(error);
+      req.flash('errorMessage', 'Failed to update password');
+      res.redirect('/users/changepassword');
     }
   })
 
