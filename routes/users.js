@@ -68,12 +68,45 @@ module.exports = function (db) {
     }
   });
 
-  router.post('/delete/:id', async (req, res) => {
+  router.post('/delete/:id', isLoggedIn, async (req, res) => {
     const { id } = req.params;
     await User.destroy({ where: { id } });
     res.redirect('/users');
   });
 
+  router.get('/profile', isLoggedIn, async function (req, res) {
+    try {
+      res.render('users/profile', {
+        user: req.session.user,
+        errorMessage: req.flash('errorMessage'),
+        successMessage: req.flash('successMessage')
+      })
+    } catch (error) {
+      console.log(error)
+    }
+  })
+
+  router.post('/profile', isLoggedIn, async function (req, res) {
+    try {
+      const { email, name } = req.body;
+      const userId = req.session.user.id;
+
+      await User.update(
+        { email, name },
+        { where: { id: userId } }
+      );
+
+      const updatedUser = await User.findByPk(userId);
+      req.session.user = updatedUser;
+
+      req.flash('successMessage', 'Profile updated successfully!');
+      res.redirect('/users/profile');
+    } catch (error) {
+      console.error(error);
+      req.flash('errorMessage', 'Failed to update profile');
+      res.redirect('/users/profile');
+    }
+  })
 
   return router;
 }
