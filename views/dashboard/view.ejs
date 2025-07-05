@@ -48,12 +48,13 @@
               <div class="d-sm-flex align-items-start justify-content-between mb-4">
                 <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
                 <div class="btn-group">
-                  <a href="/dashboard/download" class="btn btn-sm btn-primary shadow-sm"><i
-                      class="fas fa-download fa-sm text-white-50"></i> Generate Report</a>
+                  <a href="/dashboard/download?<%= startdate ? 'startdate=' + startdate + '&' : '' %><%= enddate ? 'enddate=' + enddate : '' %>"
+                    class="btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i>
+                    Generate Report</a>
                 </div>
               </div>
 
-              <form>
+              <form method="get" action="/dashboard">
                 <div class="card mb-4">
                   <div class="card-header">
                     <strong class="text-primary">
@@ -64,29 +65,30 @@
                     <div class="row">
                       <div class="col">
                         <label for="startdate">Start Date</label>
-                        <input type="date" class="form-control" id="startdate" name="startdate">
+                        <input type="date" class="form-control" id="startdate" name="startdate"
+                          value="<%= startdate || '' %>">
                       </div>
                       <div class="col">
                         <label for="enddate">End Date</label>
-                        <input type="date" class="form-control" id="enddate" name="enddate">
+                        <input type="date" class="form-control" id="enddate" name="enddate" value="<%= enddate || '' %>"">
                       </div>
                     </div>
                   </div>
-                  <div class="card-footer">
-                    <button type="submit" class="btn btn-icon-split btn-success">
-                      <span class="icon text-white-50">
-                        <i class="fa fa-check"></i>
-                      </span>
-                      <span class="text">Query</span>
-                    </button>
-                    <button type="button" class="btn btn-icon-split btn-warning">
-                      <span class="icon text-white-50">
-                        <i class="fa fa-arrow-left"></i>
-                      </span>
-                      <span class="text">Reset</span>
-                    </button>
-                  </div>
-                </div>
+                  <div class=" card-footer">
+                        <button type="submit" class="btn btn-icon-split btn-success">
+                          <span class="icon text-white-50">
+                            <i class="fa fa-check"></i>
+                          </span>
+                          <span class="text">Query</span>
+                        </button>
+                        <a href="/dashboard" class="btn btn-icon-split btn-warning">
+                          <span class="icon text-white-50">
+                            <i class="fa fa-arrow-left"></i>
+                          </span>
+                          <span class="text">Reset</span>
+                        </a>
+                      </div>
+                    </div>
               </form>
 
               <div class="row">

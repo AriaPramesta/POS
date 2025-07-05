@@ -10,27 +10,53 @@ const { createObjectCsvWriter } = require('csv-writer');
 module.exports = function (db) {
   router.get('/download', isLoggedIn, async function (req, res) {
     try {
+      const { startdate, enddate } = req.query;
+
+      // Filter tanggal yang sama seperti route '/'
+      let dateFilterSales = '';
+      let dateFilterPurchases = '';
+      let replacements = {};
+
+      if (startdate && enddate) {
+        dateFilterSales = `WHERE time BETWEEN :startdate AND :enddate`;
+        dateFilterPurchases = `WHERE time BETWEEN :startdate AND :enddate`;
+        replacements = { startdate, enddate };
+      } else if (startdate) {
+        dateFilterSales = `WHERE time >= :startdate`;
+        dateFilterPurchases = `WHERE time >= :startdate`;
+        replacements = { startdate };
+      } else if (enddate) {
+        dateFilterSales = `WHERE time <= :enddate`;
+        dateFilterPurchases = `WHERE time <= :enddate`;
+        replacements = { enddate };
+      }
+
       const report = await sequelize.query(`
-        SELECT
-          TO_CHAR(COALESCE(sales.month, purchases.month), 'Mon YY') AS label,
-          COALESCE(sales.total_revenue, 0) AS revenue,
-          COALESCE(purchases.total_expense, 0) AS expense,
-          COALESCE(sales.total_revenue, 0) - COALESCE(purchases.total_expense, 0) AS earning
-        FROM
-          (
-            SELECT DATE_TRUNC('month', time) AS month, SUM(totalsum) AS total_revenue
-            FROM "Sales"
-            GROUP BY month
-          ) sales
-        FULL OUTER JOIN
-          (
-            SELECT DATE_TRUNC('month', time) AS month, SUM(totalsum) AS total_expense
-            FROM "Purchases"
-            GROUP BY month
-          ) purchases
-        ON sales.month = purchases.month
-        ORDER BY COALESCE(sales.month, purchases.month)
-      `, { type: QueryTypes.SELECT });
+      SELECT
+        TO_CHAR(COALESCE(sales.month, purchases.month), 'Mon YY') AS label,
+        COALESCE(sales.total_revenue, 0) AS revenue,
+        COALESCE(purchases.total_expense, 0) AS expense,
+        COALESCE(sales.total_revenue, 0) - COALESCE(purchases.total_expense, 0) AS earning
+      FROM
+        (
+          SELECT DATE_TRUNC('month', time) AS month, SUM(totalsum) AS total_revenue
+          FROM "Sales"
+          ${dateFilterSales}
+          GROUP BY month
+        ) sales
+      FULL OUTER JOIN
+        (
+          SELECT DATE_TRUNC('month', time) AS month, SUM(totalsum) AS total_expense
+          FROM "Purchases"
+          ${dateFilterPurchases}
+          GROUP BY month
+        ) purchases
+      ON sales.month = purchases.month
+      ORDER BY COALESCE(sales.month, purchases.month)
+    `, {
+        type: QueryTypes.SELECT,
+        replacements
+      });
 
       const csvWriter = createObjectCsvWriter({
         path: 'report.csv',
@@ -43,51 +69,76 @@ module.exports = function (db) {
       });
 
       await csvWriter.writeRecords(report);
-
       res.download('report.csv', 'report.csv');
+
     } catch (error) {
       console.error(error);
       res.status(500).send('Error generating report');
     }
   });
 
+
   router.get('/', isLoggedIn, async function (req, res, next) {
     try {
+      const { startdate, enddate } = req.query;
+
+      // Date filter clause
+      let dateFilterSales = '';
+      let dateFilterPurchases = '';
+      let replacements = {};
+
+      if (startdate && enddate) {
+        dateFilterSales = `WHERE time BETWEEN :startdate AND :enddate`;
+        dateFilterPurchases = `WHERE time BETWEEN :startdate AND :enddate`;
+        replacements = { startdate, enddate };
+      } else if (startdate) {
+        dateFilterSales = `WHERE time >= :startdate`;
+        dateFilterPurchases = `WHERE time >= :startdate`;
+        replacements = { startdate };
+      } else if (enddate) {
+        dateFilterSales = `WHERE time <= :enddate`;
+        dateFilterPurchases = `WHERE time <= :enddate`;
+        replacements = { enddate };
+      }
+
       const report = await sequelize.query(`
-        SELECT
-          TO_CHAR(COALESCE(sales.month, purchases.month), 'Mon YY') AS label,
-          COALESCE(sales.total_revenue, 0) AS revenue,
-          COALESCE(purchases.total_expense, 0) AS expense,
-          COALESCE(sales.total_revenue, 0) - COALESCE(purchases.total_expense, 0) AS earning
-        FROM
-          (
-            SELECT DATE_TRUNC('month', time) AS month, SUM(totalsum) AS total_revenue
-            FROM "Sales"
-            GROUP BY month
-          ) sales
-        FULL OUTER JOIN
-          (
-            SELECT DATE_TRUNC('month', time) AS month, SUM(totalsum) AS total_expense
-            FROM "Purchases"
-            GROUP BY month
-          ) purchases
-        ON sales.month = purchases.month
-        ORDER BY COALESCE(sales.month, purchases.month)
-      `, { type: QueryTypes.SELECT });
+      SELECT
+        TO_CHAR(COALESCE(sales.month, purchases.month), 'Mon YY') AS label,
+        COALESCE(sales.total_revenue, 0) AS revenue,
+        COALESCE(purchases.total_expense, 0) AS expense,
+        COALESCE(sales.total_revenue, 0) - COALESCE(purchases.total_expense, 0) AS earning
+      FROM
+        (
+          SELECT DATE_TRUNC('month', time) AS month, SUM(totalsum) AS total_revenue
+          FROM "Sales"
+          ${dateFilterSales}
+          GROUP BY month
+        ) sales
+      FULL OUTER JOIN
+        (
+          SELECT DATE_TRUNC('month', time) AS month, SUM(totalsum) AS total_expense
+          FROM "Purchases"
+          ${dateFilterPurchases}
+          GROUP BY month
+        ) purchases
+      ON sales.month = purchases.month
+      ORDER BY COALESCE(sales.month, purchases.month)
+    `, {
+        type: QueryTypes.SELECT,
+        replacements
+      });
 
       const totalPurchase = report.reduce((sum, r) => sum + Number(r.expense), 0);
       const totalSales = report.reduce((sum, r) => sum + Number(r.revenue), 0);
       const earnings = report.reduce((sum, r) => sum + Number(r.earning), 0);
 
       const countSales = await Sale.count();
-
       const directCount = await Sale.count({
         include: {
           model: Customer,
           where: { name: 'Umum' }
         }
       });
-
       const customerCount = await Sale.count({
         include: {
           model: Customer,
@@ -105,10 +156,6 @@ module.exports = function (db) {
         earning: earnings
       };
 
-
-      console.log({ totalPurchase, totalSales, earnings });
-      console.table(totalRow);
-
       res.render('dashboard/view', {
         user: req.session.user,
         totalPurchase,
@@ -119,7 +166,9 @@ module.exports = function (db) {
         labels: JSON.stringify(labels),
         earningsData: JSON.stringify(earningsData),
         dataTable: report,
-        totalDataTable: totalRow
+        totalDataTable: totalRow,
+        startdate,
+        enddate
       });
 
     } catch (err) {
@@ -127,6 +176,7 @@ module.exports = function (db) {
       res.status(500).send('Error fetching dashboard data');
     }
   });
+
 
   return router;
 }
