@@ -54,8 +54,16 @@ module.exports = function (db) {
       const labels = report.map(r => r.label);
       const earningsData = report.map(r => Number(r.earning));
 
+      const totalRow = {
+        label: 'Total',
+        revenue: totalSales,
+        expense: totalPurchase,
+        earning: earnings
+      };
+
+
       console.log({ totalPurchase, totalSales, earnings });
-      console.table(report);
+      console.table(totalRow);
 
       res.render('dashboard/view', {
         user: req.session.user,
@@ -66,7 +74,8 @@ module.exports = function (db) {
         data: JSON.stringify([directCount, customerCount]),
         labels: JSON.stringify(labels),
         earningsData: JSON.stringify(earningsData),
-        dataTable: report
+        dataTable: report,
+        totalDataTable: totalRow
       });
 
     } catch (err) {

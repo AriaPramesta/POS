@@ -263,7 +263,7 @@
                     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                       <thead>
                         <tr>
-                          <th>Bulan</th>
+                          <th>Monthly</th>
                           <th>Expense</th>
                           <th>Revenue</th>
                           <th>Earning</th>
@@ -291,10 +291,18 @@
                       </tbody>
                       <tfoot>
                         <tr>
-                          <th>Bulan</th>
-                          <th>Expense</th>
-                          <th>Revenue</th>
-                          <th>Earning</th>
+                          <th>
+                            <%= totalDataTable.label %>
+                          </th>
+                          <th>
+                            <%= Number(totalDataTable.expense).toLocaleString() %>
+                          </th>
+                          <th>
+                            <%= Number(totalDataTable.revenue).toLocaleString() %>
+                          </th>
+                          <th style="color: <%= totalDataTable.earning < 0 ? 'red' : 'green' %>">
+                            <%= Number(totalDataTable.earning).toLocaleString('id-ID') %>
+                          </th>
                         </tr>
                       </tfoot>
                     </table>
