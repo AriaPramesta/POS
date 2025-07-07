@@ -86,15 +86,24 @@
                                                             <%= purchase.Supplier.name %>
                                                         </td>
                                                         <td>
-                                                            <a href="/purchases/edit/<%= purchase.invoice %>"
-                                                                class="btn btn-circle btn-success">
-                                                                <i class="fa fa-info-circle"></i>
-                                                            </a>
-                                                            <button class="btn btn-circle btn-danger"
-                                                                data-toggle="modal" data-target="#deleteModal"
-                                                                data-id="<%= purchase.invoice %>">
-                                                                <i class="fa fa-trash"></i>
-                                                            </button>
+                                                            <% if (purchase.operator===user.id) { %>
+                                                                <a href="/purchases/edit/<%= purchase.invoice %>"
+                                                                    class="btn btn-circle btn-success">
+                                                                    <i class="fa fa-info-circle"></i>
+                                                                </a>
+                                                                <button class="btn btn-circle btn-danger"
+                                                                    data-toggle="modal" data-target="#deleteModal"
+                                                                    data-id="<%= purchase.invoice %>">
+                                                                    <i class="fa fa-trash"></i>
+                                                                </button>
+                                                                <% } else { %>
+                                                                    <button class="btn btn-circle btn-success" disabled>
+                                                                        <i class="fa fa-info-circle"></i>
+                                                                    </button>
+                                                                    <button class="btn btn-circle btn-danger" disabled>
+                                                                        <i class="fa fa-trash"></i>
+                                                                    </button>
+                                                                    <% } %>
                                                         </td>
                                                     </tr>
                                                     <% }); %>
