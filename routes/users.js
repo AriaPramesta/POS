@@ -1,11 +1,11 @@
 var express = require('express');
-const { isLoggedIn, comparePassword, generatePassword } = require('../helper/util');
+const { isAdmin, isLoggedIn, comparePassword, generatePassword } = require('../helper/util');
 var router = express.Router();
 const { User } = require('../models')
 const { Op } = require('sequelize')
 
 module.exports = function (db) {
-  router.get('/', isLoggedIn, async function (req, res, next) {
+  router.get('/', isAdmin, async function (req, res, next) {
     try {
 
       const users = await User.findAll();
@@ -19,11 +19,11 @@ module.exports = function (db) {
     }
   });
 
-  router.get('/add', isLoggedIn, function (req, res, next) {
+  router.get('/add', isAdmin, function (req, res, next) {
     res.render('users/form', { user: req.session.user, item: null });
   });
 
-  router.post('/add', isLoggedIn, async function (req, res, next) {
+  router.post('/add', isAdmin, async function (req, res, next) {
     try {
       const { email, name, password, role } = req.body
       await User.create({ email, name, password, role })
@@ -34,7 +34,7 @@ module.exports = function (db) {
     }
   });
 
-  router.get('/edit/:id', isLoggedIn, async function (req, res, next) {
+  router.get('/edit/:id', isAdmin, async function (req, res, next) {
     try {
       const id = req.params.id;
 
@@ -51,7 +51,7 @@ module.exports = function (db) {
     }
   });
 
-  router.post('/edit/:id', isLoggedIn, async function (req, res, next) {
+  router.post('/edit/:id', isAdmin, async function (req, res, next) {
     try {
       const id = req.params.id;
       const { email, name, role } = req.body;
@@ -68,7 +68,7 @@ module.exports = function (db) {
     }
   });
 
-  router.post('/delete/:id', isLoggedIn, async (req, res) => {
+  router.post('/delete/:id', isAdmin, async (req, res) => {
     const { id } = req.params;
     await User.destroy({ where: { id } });
     res.redirect('/users');

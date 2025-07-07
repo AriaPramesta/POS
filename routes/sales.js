@@ -2,7 +2,6 @@ var express = require('express');
 var router = express.Router();
 const { isLoggedIn } = require('../helper/util');
 const { Sale, Customer, SaleItem, Good, User, sequelize } = require('../models')
-const { Op } = require('sequelize');
 const moment = require('moment');
 const { generateInvoiceNumber } = require('../services/salesService');
 

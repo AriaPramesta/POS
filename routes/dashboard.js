@@ -1,5 +1,5 @@
 var express = require('express');
-const { isLoggedIn } = require('../helper/util');
+const { isAdmin } = require('../helper/util')
 const { Purchase, Sale, Customer } = require('../models')
 const { Op } = require('sequelize')
 var router = express.Router();
@@ -8,7 +8,7 @@ const { QueryTypes } = require('sequelize');
 const { createObjectCsvWriter } = require('csv-writer');
 
 module.exports = function (db) {
-  router.get('/download', isLoggedIn, async function (req, res) {
+  router.get('/download', isAdmin, async function (req, res) {
     try {
       const { startdate, enddate } = req.query;
 
@@ -78,7 +78,7 @@ module.exports = function (db) {
   });
 
 
-  router.get('/', isLoggedIn, async function (req, res, next) {
+  router.get('/', isAdmin, async function (req, res, next) {
     try {
       const { startdate, enddate } = req.query;
 

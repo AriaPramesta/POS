@@ -13,11 +13,13 @@
     <hr class="sidebar-divider my-0">
 
     <!-- Nav Item - Dashboard -->
+    <% if (user && user.role === 'admin') { %>
     <li class="nav-item <%= currentPath.startsWith('/dashboard') ? 'active' : '' %>">
         <a class="nav-link" href="/dashboard">
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span></a>
     </li>
+    <% } %>
 
     <!-- Divider -->
     <hr class="sidebar-divider">
@@ -28,6 +30,7 @@
     </div>
 
     <!-- Nav Item - Utilities Collapse Menu -->
+    <% if (user && user.role === 'admin') { %>
     <li class="nav-item <%= currentPath.startsWith('/goods') || currentPath.startsWith('/units') ? 'active' : '' %>"">
         <a class=" nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseUtilities"
         aria-expanded="true" aria-controls="collapseUtilities">
@@ -42,6 +45,7 @@
             </div>
         </div>
     </li>
+    <% } %>
 
     <!-- Nav Item - Suppliers -->
     <li class="nav-item <%=currentPath.startsWith('/suppliers') ? 'active' : '' %>">
@@ -58,11 +62,13 @@
     </li>
 
     <!-- Nav Item - Users -->
-    <li class="nav-item <%= currentPath.startsWith('/users') ? 'active' : '' %>">
+    <% if (user && user.role === 'admin') { %>
+    <li class="nav-item <%=currentPath.startsWith('/users') ? 'active' : '' %>">
         <a class="nav-link" href="/users">
             <i class="fas fa-fw fa-user"></i>
             <span>Users</span></a>
     </li>
+    <% } %>
 
     <!-- Divider -->
     <hr class="sidebar-divider">

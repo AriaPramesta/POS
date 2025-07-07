@@ -26,7 +26,11 @@ module.exports = function (db) {
 
             if (checkPw) {
                 req.session.user = user
-                return res.redirect('/dashboard')
+                if (req.session.user.role === 'operator') {
+                    return res.redirect('/sales');
+                } else {
+                    return res.redirect('/dashboard');
+                }
             } else {
                 req.flash('errorMessage', 'Wrong Email or Password!')
                 return res.redirect('/');

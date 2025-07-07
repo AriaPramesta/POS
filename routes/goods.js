@@ -1,12 +1,11 @@
 var express = require('express');
-const { isLoggedIn } = require('../helper/util');
+const { isAdmin } = require('../helper/util')
 var router = express.Router();
 const path = require('path');
 const { Good, Unit } = require('../models')
-const { Op } = require('sequelize')
 
 module.exports = function (db) {
-    router.get('/', isLoggedIn, async function (req, res, next) {
+    router.get('/', isAdmin, async function (req, res, next) {
         try {
             const goods = await Good.findAll();
 
@@ -19,7 +18,7 @@ module.exports = function (db) {
         }
     });
 
-    router.get('/add', isLoggedIn, async function (req, res, next) {
+    router.get('/add', isAdmin, async function (req, res, next) {
         try {
             const units = await Unit.findAll()
             res.render('goods/form', { user: req.session.user, units, good: null });
@@ -28,7 +27,7 @@ module.exports = function (db) {
         }
     });
 
-    router.post('/add', isLoggedIn, async function (req, res) {
+    router.post('/add', isAdmin, async function (req, res) {
         try {
             const { barcode, name, stock, purchaseprice, sellingprice, unit } = req.body;
 
@@ -72,7 +71,7 @@ module.exports = function (db) {
         }
     });
 
-    router.get('/edit/:id', isLoggedIn, async function (req, res, next) {
+    router.get('/edit/:id', isAdmin, async function (req, res, next) {
         try {
             const id = req.params.id;
 
@@ -90,7 +89,7 @@ module.exports = function (db) {
         }
     });
 
-    router.post('/edit/:id', isLoggedIn, async function (req, res, next) {
+    router.post('/edit/:id', isAdmin, async function (req, res, next) {
         try {
             const id = req.params.id;
             const { barcode, name, stock, unit, purchaseprice, sellingprice, picture } = req.body;
@@ -117,7 +116,7 @@ module.exports = function (db) {
         }
     });
 
-    router.post('/delete/:id', async (req, res) => {
+    router.post('/delete/:id', isAdmin, async (req, res) => {
         const { id } = req.params;
         await Good.destroy({ where: { barcode: id } });
         res.redirect('/goods');
