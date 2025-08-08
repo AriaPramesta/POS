@@ -22,3 +22,43 @@
 
 <!-- Page level custom scripts -->
 <script src="/javascripts/demo/datatables-demo.js"></script>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+
+    socket.on('stock-alert', (alerts) => {
+        const list = document.getElementById('alerts-list');
+        const count = document.getElementById('alert-count');
+
+        list.innerHTML = '';
+
+        if (alerts.length > 0) {
+            count.innerText = alerts.length;
+            alerts.forEach(alert => {
+                const alertItem = document.createElement('a');
+                alertItem.className = 'dropdown-item d-flex align-items-center';
+                alertItem.href = `/purchases/add?barcode=${alert.barcode}`;
+
+                alertItem.innerHTML = `
+          <div class="mr-3">
+            <div class="icon-circle bg-warning">
+              <i class="fas fa-exclamation-triangle text-white"></i>
+            </div>
+          </div>
+          <div>
+            <div class="small text-gray-500">Barcode: ${alert.barcode}</div>
+            <span class="font-weight-bold">Stock Alert: ${alert.name} only have stock ${alert.stock}!</span>
+          </div>
+        `;
+                list.appendChild(alertItem);
+            });
+        } else {
+            count.innerText = '0';
+            const empty = document.createElement('a');
+            empty.className = 'dropdown-item text-muted';
+            empty.textContent = 'Tidak ada alert';
+            list.appendChild(empty);
+        }
+    });
+</script>

@@ -79,6 +79,21 @@ module.exports = function (db) {
 
         try {
             const purchaseItem = await PurchaseItem.create({ invoice, itemcode, quantity, purchaseprice, totalprice })
+
+            const io = req.app.get('io');
+            const lowStocks = await Good.findAll({
+                where: {
+                    stock: { [Op.lt]: 10 }
+                }
+            });
+            const alerts = lowStocks.map(item => ({
+                id: item.id,
+                barcode: item.code,
+                name: item.name,
+                stock: item.stock
+            }));
+            io.emit('stock-alert', alerts);
+
             const item = await PurchaseItem.findOne({
                 where: { id: purchaseItem.id },
                 include: [{
@@ -89,8 +104,8 @@ module.exports = function (db) {
             const purchase = await Purchase.findByPk(item.invoice)
             res.status(201).json({ purchase, item })
         } catch (error) {
-            console.log(err)
-            res.status(400).json({ error: err.message });
+            console.log(error)
+            res.status(400).json({ error: error.message });
 
         }
     })
